@@ -7,6 +7,11 @@ type Row = [Cell]
 
 type Board = [Row]
 
+type LocX = Int 
+type LocY = Int
+
+type Location = (LocX, LocY)
+
 startingBoard :: Board
 startingBoard = [[Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing],
                  [Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing],
@@ -20,7 +25,7 @@ startingBoard = [[Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing,
 displayBoard :: Board -> IO ()
 displayBoard = putStr . (++) "\n-----------------\n" . boardString 
 
-
+-- Helper functions for displayBoard
 boardString :: Board -> String
 boardString [] = "ERR: INVALID BOARD"
 boardString [x] = rowString x
@@ -36,9 +41,18 @@ cellString (Nothing) = "| "
 cellString (Just B) = "|B"
 cellString (Just W) = "|W"
 
+-- For placing a disc within a row on the board
+placeRow :: Maybe Disc -> LocX -> Row -> Row
+placeRow disc loc = (replaceCell disc loc) . keyRow
 
-placeDisc :: Disc -> Board -> (Char, Int) -> Board
-placeDisc x y (c, i) = undefined
+replaceCell :: Maybe Disc -> LocX -> [(LocX, Cell)] -> Row
+replaceCell _ _ [] = []
+replaceCell disc loc row = [if x == loc then disc else c | (x, c) <- row ] 
+
+-- Gives each cell in a row a LocX
+keyRow :: Row -> [(LocX, Cell)]
+keyRow [] = []
+keyRow row = zip [0..] row
 
 hasMoves :: Disc -> Board -> Bool
 hasMoves x = undefined
