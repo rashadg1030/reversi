@@ -42,17 +42,17 @@ cellString (Just B) = "|B"
 cellString (Just W) = "|W"
 
 -- For placing a disc within a row on the board
-placeRow :: Maybe Disc -> LocX -> Row -> Row
-placeRow disc loc = (replaceCell disc loc) . keyRow
+placeDisc :: Maybe Disc -> Location -> Board -> Board
+placeDisc disc (locX, locY) board = [if key == locY then (placeDiscX disc locX row) else row | (key, row) <- (mapList board)]
 
-replaceCell :: Maybe Disc -> LocX -> [(LocX, Cell)] -> Row
-replaceCell _ _ [] = []
-replaceCell disc loc row = [if x == loc then disc else c | (x, c) <- row ] 
+-- Places a disc in a row. Depends on the LocX. 
+placeDiscX :: Maybe Disc -> LocX -> Row -> Row
+placeDiscX _ _ [] = []
+placeDiscX disc locX row = [if key == locX then disc else cell | (key, cell) <- (mapList row)] 
 
--- Gives each cell in a row a LocX
-keyRow :: Row -> [(LocX, Cell)]
-keyRow [] = []
-keyRow row = zip [0..] row
+-- Maps each item in the list to an Int
+mapList :: [a] -> [(Int, a)]
+mapList = (zip [0..])
 
 hasMoves :: Disc -> Board -> Bool
 hasMoves x = undefined
