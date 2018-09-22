@@ -77,6 +77,14 @@ isWhiteDisc :: Cell -> Bool
 isWhiteDisc White = True
 isWhiteDisc _ = False
 
+isSameCell :: Cell -> Cell -> Bool 
+isSameCell = (==) 
+
+isSameCellMap :: Cell -> Row -> [Bool]
+isSameCellMap measure = map (isSameCell measure) 
+
+
+
 -- Will determine if given location is a possible move on the board for the given color of disc.
 canPlace :: Cell -> Location -> Board -> Bool
 canPlace = undefined

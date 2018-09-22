@@ -11,3 +11,5 @@ testDisplayBoard = displayBoard startingBoard
 
 testChangeCell =  displayBoard $ changeCell White (5,6) startingBoard
 
+testIsSameCellMap = (isSameCellMap White [Black, White, White, Empty, Empty, Black, White]) == [False, True, True, False, False, False, True]
+
