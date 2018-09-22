@@ -87,6 +87,12 @@ shaveRow locX = drop $ locX + 1
 
 -- 
 
+isOppositeCell :: Cell -> Cell -> Bool
+isOppositeCell Black White = True
+isOppositeCell White Black = True
+isOppositeCell _ _ = False
+
+
 isSameCell :: Cell -> Cell -> Bool 
 isSameCell = (==) 
 

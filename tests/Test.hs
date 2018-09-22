@@ -15,3 +15,5 @@ testIsSameCellMap = (isSameCellMap White [Black, White, White, Empty, Empty, Bla
 
 testShaveRow = (shaveRow 1 [White, Empty, White, White, Black, White, White, White]) == [White,White,Black,White,White,White]
 
+testIsOppositeCell = ([(isOppositeCell Black White), (isOppositeCell Black Black), (isOppositeCell White Empty), (isOppositeCell Empty Empty)]) == [True, False, False, False]
+
