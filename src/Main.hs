@@ -77,12 +77,21 @@ isWhiteDisc :: Cell -> Bool
 isWhiteDisc White = True
 isWhiteDisc _ = False
 
+{--
+  Thee following functions are helper functions for checking a valid play on the board.
+--}
+
+-- First, drop the first LocX + 1 elements of the list
+shaveRow :: LocX -> Row -> Row
+shaveRow locX = drop $ locX + 1  
+
+-- 
+
 isSameCell :: Cell -> Cell -> Bool 
 isSameCell = (==) 
 
 isSameCellMap :: Cell -> Row -> [Bool]
 isSameCellMap measure = map (isSameCell measure) 
-
 
 
 -- Will determine if given location is a possible move on the board for the given color of disc.
