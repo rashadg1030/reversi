@@ -5,10 +5,10 @@ version:             0.1.0.0
 homepage:            https://github.com/githubuser/Reversi#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2018 Author name here
-category:            Web
+author:              Rashad Gover
+maintainer:          rashad.sasaki@gmail.com
+copyright:           2018 Rashad Gover
+category:            CLI Application
 build-type:          Simple
 cabal-version:       >=1.10
 extra-source-files:  README.md
