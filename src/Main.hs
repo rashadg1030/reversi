@@ -31,7 +31,7 @@ startingBoard = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
                  [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty]]
 
 displayBoard :: Board -> IO ()
-displayBoard = putStr . (++) "\n-----------------\n" . boardString 
+displayBoard = putStr . (++) "\n---------------------------------\n" . boardString 
 
 -- Creates a string representation of a board.
 boardString :: Board -> String
@@ -42,14 +42,14 @@ boardString (x:xs) = rowString x ++ boardString xs
 -- Creates a string representation of a row.
 rowString :: Row -> String
 rowString [] = "ERR: INVALID ROW"
-rowString [x] = cellString x ++ "|\n-----------------\n"
+rowString [x] = cellString x ++ "|\n---------------------------------\n"
 rowString (x:xs) = cellString x ++ rowString xs
 
 -- Creates a string representation of a cell.
 cellString :: Cell -> String
-cellString Empty = "| "
-cellString Black = "|B"
-cellString White = "|W"
+cellString Empty = "|   "
+cellString Black = "| B "
+cellString White = "| W "
 
 -- For changing a cell on the board.
 changeCell :: Cell -> Location -> Board -> Board
