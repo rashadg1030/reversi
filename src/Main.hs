@@ -82,8 +82,16 @@ isWhiteDisc _     = False
 --}
 
 -- First, drop the first LocX + 1 elements of the list
-shaveRow :: LocX -> Row -> Row
-shaveRow locX = drop $ locX + 1  
+{--
+This is only work in one direction. Changing it up so that it creates a pair rows. One row consisting of cells 
+before the play cell, and one consisting of cells coming after it. 
+  shaveRow :: LocX -> Row -> Row
+  shaveRow locX = drop $ locX + 1  
+--}
+
+-- Not really shaving, but I don't have a better name. This splits the row into two rows. 
+shaveRow :: LocX -> Row -> (Row, Row)
+shaveRow locX row = ((drop (locX + 1) row), (take (locX - 1) row))  
 
 -- Then, divide the shaved row into two rows according to color of disc that is being played.
 divideRow :: Cell -> Row -> (Row, Row)
