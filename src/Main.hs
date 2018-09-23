@@ -65,9 +65,9 @@ mapList :: [a] -> [(Int, a)]
 mapList = (zip [0..])
 
 -- Check if board cell is empty
-isEmptyCell :: Cell -> Bool
-isEmptyCell Empty = True
-isEmptyCell _     = False
+isEmptyCell :: (LocX, Cell) -> Bool
+isEmptyCell (_, Empty) = True
+isEmptyCell _          = False
 
 isBlackDisc :: Cell -> Bool
 isBlackDisc Black = True
@@ -81,7 +81,6 @@ isWhiteDisc _     = False
   Thee following functions are helper functions for checking a valid play on the board.
 --}
 
--- First, drop the first LocX + 1 elements of the list
 {--
 This is only work in one direction. Changing it up so that it creates a pair rows. One row consisting of cells 
 before the play cell, and one consisting of cells coming after it. 
@@ -89,58 +88,44 @@ before the play cell, and one consisting of cells coming after it.
   shaveRow locX = drop $ locX + 1  
 --}
 
+playHorizontal :: Cell -> LocX -> Row -> Row
+playHorizontal Empty _ row   = row
+playHorizontal disc locX row = if checkLocX locX row then (if canPlay then newLeft ++ [disc] ++ newRight else row) else row
+                              where  
+                                left          =  reverse $ fst $ shaveRow locX row
+                                right         =  snd $ shaveRow locX row
+                                leftDivided   =  divideRow disc left
+                                rightDivided  =  divideRow disc right
+                                newLeft       = reverse $ flipCaptured leftDivided
+                                newRight      = flipCaptured rightDivided
+                                canPlay       = (checkRowPair leftDivided) || (checkRowPair rightDivided)
+
+-- Helper function for playHorizontal that checks if LocX is an Empty cell
+checkLocX :: LocX -> Row -> Bool
+checkLocX locX row = (length emptyCellAndMatch) > 0
+                  where 
+                    cellMap = mapList row
+                    emptyCellMap = filter isEmptyCell cellMap
+                    emptyCellAndMatch = filter (\(fst, snd) -> fst == locX) emptyCellMap 
+
+
+
 -- Not really shaving, but I don't have a better name. This splits the row into two rows. First step.
 -- Reverse the row that is on the left of the play cell so that it can be checked properly.
 shaveRow :: LocX -> Row -> (Row, Row)
-shaveRow locX row = (reverse (drop (locX + 1) row), take (locX - 1) row)  
-
-
+shaveRow locX row = ((take locX row), (drop (locX + 1) row))  
 
 -- Then, divide the shaved row into two rows according to color of disc that is being played.
 divideRow :: Cell -> Row -> (Row, Row)
 divideRow measure row = ((takeWhile (isOppositeCell measure) row), (dropWhile (isOppositeCell measure) row))
 
--- Then based on the pair of rows, decide if play is valid or not.
-checkRowPair :: (Row, Row) -> Bool
-checkRowPair ([], [])         = False
-checkRowPair ([], tail)       = False
-checkRowPair (captured, [])   = False
-checkRowPair ((c:cs), (t:ts)) = isOppositeCell c t
-
-
-
-isOppositeCell :: Cell -> Cell -> Bool
-isOppositeCell Black White = True
-isOppositeCell White Black = True
-isOppositeCell _ _         = False
-
-
-isSameCell :: Cell -> Cell -> Bool 
-isSameCell = (==) 
-
-isSameCellMap :: Cell -> Row -> [Bool]
-isSameCellMap measure = map (isSameCell measure) 
-
-
--- Will determine if given location is a possible move on the board for the given color of disc.
-canPlace :: Cell -> Location -> Board -> Bool
-canPlace = undefined
-
--- Will check to the right of the disk for a valid move
-{--
-checkRight :: Cell -> LocX -> Row -> Cell
-checkRight disc locX row = rightOfLocX
-  where rightOfLocX = drop locX row
---}
-
-
--- Will determine if given locX is a possible move within the row for the given color of disc.
-checkHorizontal :: Cell -> LocX -> Row -> Bool
-checkHorizontal disc locX row = undefined
-
--- Check sides of given LocX for 
-checkSides :: Cell -> LocX -> Row -> Bool
-checkSides disc locX row = undefined
+-- do something after checkRowPair to flip cells in row pair. Last step.
+flipCaptured :: (Row, Row) -> Row 
+flipCaptured ([], [])         = []
+flipCaptured ([], tail)       = tail
+flipCaptured (captured, [])   = captured
+flipCaptured (captured@(c:cs), tail@(t:ts)) = if isOppositeCell c t then (flipRow captured) ++ tail else captured ++ tail 
+--flipCaptured (captured, tail) = (flipRow captured) ++ tail 
 
 -- Flip all cells in a row
 flipRow :: Row -> Row
@@ -151,4 +136,31 @@ flipCell :: Cell -> Cell
 flipCell Empty = Empty
 flipCell Black = White
 flipCell White = Black
+
+-- Then based on the pair of rows, decide if play is valid or not.
+-- Might not need?
+checkRowPair :: (Row, Row) -> Bool
+checkRowPair ([], [])         = False
+checkRowPair ([], tail)       = False
+checkRowPair (captured, [])   = False
+checkRowPair ((c:cs), (t:ts)) = isOppositeCell c t
+
+isOppositeCell :: Cell -> Cell -> Bool
+isOppositeCell Black White = True
+isOppositeCell White Black = True
+isOppositeCell _ _         = False
+
+isSameCell :: Cell -> Cell -> Bool 
+isSameCell = (==) 
+
+isSameCellMap :: Cell -> Row -> [Bool]
+isSameCellMap measure = map (isSameCell measure) 
+
+-- Will check to the right of the disk for a valid move
+{--
+checkRight :: Cell -> LocX -> Row -> Cell
+checkRight disc locX row = rightOfLocX
+  where rightOfLocX = drop locX row
+--}
+
 
