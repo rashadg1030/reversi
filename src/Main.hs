@@ -94,7 +94,9 @@ checkRowPair :: (Row, Row) -> Bool
 checkRowPair ([], [])         = False
 checkRowPair ([], tail)       = False
 checkRowPair (captured, [])   = False
-checkRowPair (captured, tail) = if () 
+checkRowPair ((c:cs), (t:ts)) = isOppositeCell c t
+
+
 
 isOppositeCell :: Cell -> Cell -> Bool
 isOppositeCell Black White = True

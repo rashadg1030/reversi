@@ -26,3 +26,21 @@ divideRow Tests: inputs are shaved rows
     divideRow White [Black, Black, Black, Black, Black, White]
     divideRow White [Black, Black, Black, Black, Black, Black]
 --}
+
+{--
+checkRowPair Test: inputs are a pair of rows from divideRow
+    
+    Should be False:
+        checkRowPair $ divideRow Black [Black, Empty, Black, White, White, White]
+        checkRowPair $ divideRow White [White, Empty, White, White, White]
+        checkRowPair $ divideRow Black [Black, Empty]
+        checkRowPair $ divideRow White [Black, Black, Black, Black, Black, Black]
+        checkRowPair $ divideRow White [Black, Empty, Black, Black, Black, Black]
+        checkRowPair $ divideRow White [Empty, Empty, Black, Black, Black, Black]
+
+    Should be True:
+        checkRowPair $ divideRow White [Black, Black, Black, Black, Black, White]
+        checkRowPair $ divideRow Black [White, White, Black, White, White, White]
+        checkRowPair $ divideRow Black [White, Black, Black, White, White]
+
+--}
