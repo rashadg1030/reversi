@@ -89,9 +89,12 @@ before the play cell, and one consisting of cells coming after it.
   shaveRow locX = drop $ locX + 1  
 --}
 
--- Not really shaving, but I don't have a better name. This splits the row into two rows. 
+-- Not really shaving, but I don't have a better name. This splits the row into two rows. First step.
+-- Reverse the row that is on the left of the play cell so that it can be checked properly.
 shaveRow :: LocX -> Row -> (Row, Row)
-shaveRow locX row = ((drop (locX + 1) row), (take (locX - 1) row))  
+shaveRow locX row = (reverse (drop (locX + 1) row), take (locX - 1) row)  
+
+
 
 -- Then, divide the shaved row into two rows according to color of disc that is being played.
 divideRow :: Cell -> Row -> (Row, Row)
@@ -139,6 +142,10 @@ checkHorizontal disc locX row = undefined
 checkSides :: Cell -> LocX -> Row -> Bool
 checkSides disc locX row = undefined
 
+-- Flip all cells in a row
+flipRow :: Row -> Row
+flipRow = (map flipCell)
+ 
 -- FLips a disc to the opposite color
 flipCell :: Cell -> Cell
 flipCell Empty = Empty
