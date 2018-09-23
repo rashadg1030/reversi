@@ -35,14 +35,14 @@ displayBoard = putStr . (++) "\n---------------------------------\n" . boardStri
 
 -- Creates a string representation of a board.
 boardString :: Board -> String
-boardString [] = "ERR: INVALID BOARD"
-boardString [x] = rowString x
+boardString []     = "ERR: INVALID BOARD"
+boardString [x]    = rowString x
 boardString (x:xs) = rowString x ++ boardString xs 
 
 -- Creates a string representation of a row.
 rowString :: Row -> String
-rowString [] = "ERR: INVALID ROW"
-rowString [x] = cellString x ++ "|\n---------------------------------\n"
+rowString []     = "ERR: INVALID ROW"
+rowString [x]    = cellString x ++ "|\n---------------------------------\n"
 rowString (x:xs) = cellString x ++ rowString xs
 
 -- Creates a string representation of a cell.
@@ -57,7 +57,7 @@ changeCell cell (locX, locY) board = [if key == locY then (changeCellRow cell lo
 
 -- For changing a cell in a row. 
 changeCellRow :: Cell -> LocX -> Row -> Row
-changeCellRow _ _ [] = []
+changeCellRow _ _ []           = []
 changeCellRow newCell locX row = [if key == locX then newCell else cell | (key, cell) <- (mapList row)] 
 
 -- Maps each item in the list to an Int.
@@ -67,15 +67,15 @@ mapList = (zip [0..])
 -- Check if board cell is empty
 isEmptyCell :: Cell -> Bool
 isEmptyCell Empty = True
-isEmptyCell _ = False
+isEmptyCell _     = False
 
 isBlackDisc :: Cell -> Bool
 isBlackDisc Black = True
-isBlackDisc _ = False
+isBlackDisc _     = False
 
 isWhiteDisc :: Cell -> Bool
 isWhiteDisc White = True
-isWhiteDisc _ = False
+isWhiteDisc _     = False
 
 {--
   Thee following functions are helper functions for checking a valid play on the board.
@@ -89,10 +89,17 @@ shaveRow locX = drop $ locX + 1
 divideRow :: Cell -> Row -> (Row, Row)
 divideRow measure row = ((takeWhile (isOppositeCell measure) row), (dropWhile (isOppositeCell measure) row))
 
+-- Then based on the pair of rows, decide if play is valid or not.
+checkRowPair :: (Row, Row) -> Bool
+checkRowPair ([], [])         = False
+checkRowPair ([], tail)       = False
+checkRowPair (captured, [])   = False
+checkRowPair (captured, tail) = if () 
+
 isOppositeCell :: Cell -> Cell -> Bool
 isOppositeCell Black White = True
 isOppositeCell White Black = True
-isOppositeCell _ _ = False
+isOppositeCell _ _         = False
 
 
 isSameCell :: Cell -> Cell -> Bool 
@@ -123,8 +130,8 @@ checkSides :: Cell -> LocX -> Row -> Bool
 checkSides disc locX row = undefined
 
 -- FLips a disc to the opposite color
-flip :: Cell -> Cell
-flip Empty = Empty
-flip Black = White
-flip White = Black
+flipCell :: Cell -> Cell
+flipCell Empty = Empty
+flipCell Black = White
+flipCell White = Black
 
