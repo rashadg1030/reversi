@@ -1,5 +1,7 @@
 module Main where
 
+import Data.List
+
 main :: IO ()
 main = undefined
 
@@ -22,13 +24,22 @@ type Location = (LocX, LocY)
 
 startingBoard :: Board
 startingBoard = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, White],
+                 [Empty, Empty, Empty, Empty, Empty, Black, Empty, Empty],
                  [Empty, Empty, Empty, White, Black, Empty, Empty, Empty],
                  [Empty, Empty, Empty, Black, White, Empty, Empty, Empty],
                  [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
                  [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
                  [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty]]
+
+-- Might create type Column = [Cell]??
+-- Might need Maybe
+columnToRow :: LocX -> Board -> Row
+columnToRow locX []     = []
+columnToRow locX board  = undefined --take 1 $ dropWhile (\(key, column) -> not (key == locX)) columnMap
+                       where
+                        columns = transpose board
+                        columnMap = mapList columns
 
 displayBoard :: Board -> IO ()
 displayBoard = putStr . (++) "\n---------------------------------\n" . boardString 
