@@ -85,7 +85,9 @@ isWhiteDisc _ = False
 shaveRow :: LocX -> Row -> Row
 shaveRow locX = drop $ locX + 1  
 
--- 
+-- Then, divide the shaved row into two rows according to color of disc that is being played.
+divideRow :: Cell -> Row -> (Row, Row)
+divideRow measure row = ((takeWhile (isOppositeCell measure) row), (dropWhile (isOppositeCell measure) row))
 
 isOppositeCell :: Cell -> Cell -> Bool
 isOppositeCell Black White = True

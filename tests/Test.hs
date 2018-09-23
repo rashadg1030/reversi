@@ -17,3 +17,12 @@ testShaveRow = (shaveRow 1 [White, Empty, White, White, Black, White, White, Whi
 
 testIsOppositeCell = ([(isOppositeCell Black White), (isOppositeCell Black Black), (isOppositeCell White Empty), (isOppositeCell Empty Empty)]) == [True, False, False, False]
 
+{--
+divideRow Tests: inputs are shaved rows
+    divideRow Black [White, White, Black, White, White, White]
+    divideRow Black [Empty, White, Black, White, White, White]
+    divideRow Black [Black, Empty, Black, White, White, White]
+    divideRow White [Black, Black, Black, Black, White, Black]
+    divideRow White [Black, Black, Black, Black, Black, White]
+    divideRow White [Black, Black, Black, Black, Black, Black]
+--}
