@@ -1,6 +1,7 @@
 module Main where
 
 import Data.List
+import Data.Functor
 
 main :: IO ()
 main = undefined
@@ -32,14 +33,45 @@ startingBoard = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
                  [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
                  [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty]]
 
+-- Make play vertically and horizontally
+playXY :: Cell -> Location -> Board -> Board
+playXY Empty _ board = board
+playXY _ _ [] = []
+playXY disc loc board = if locFits loc then undefined else board 
+
+-- Takes a locY and board and returns a row for processing
+getRow :: LocY -> Board -> Board
+getRow locY board = snd <$> filter f rowMap
+                  where 
+                    rowMap = mapList board 
+                    f = (\(key, _) -> (key == locY))
+
+
+-- Takes a locX and board and returns a column for processing
+getCol :: LocX -> Board -> Board 
+getColumn locX board = snd <$> filter f columnMap
+                     where 
+                      columnMap = mapList $ transpose board
+                      f = (\(key, _) -> (key == locX))
+
+locFits :: Location -> Bool
+locFits (locX, locY) = validLocX && validLocY 
+                          where 
+                            validLocX = (locX >= 0) || (locX <= 7)
+                            validLocY = (locY >= 0) || (locY <= 7)
+
 -- Might create type Column = [Cell]??
 -- Might need Maybe
-columnToRow :: LocX -> Board -> Row
+columnsToRows :: Board -> Board
+columnsToRows = transpose 
+
+{--
 columnToRow locX []     = []
 columnToRow locX board  = undefined --take 1 $ dropWhile (\(key, column) -> not (key == locX)) columnMap
-                       where
+                      where
                         columns = transpose board
                         columnMap = mapList columns
+--}
 
 displayBoard :: Board -> IO ()
 displayBoard = putStr . (++) "\n---------------------------------\n" . boardString 
