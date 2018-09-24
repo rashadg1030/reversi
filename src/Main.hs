@@ -39,20 +39,24 @@ playXY Empty _ board = board
 playXY _ _ [] = []
 playXY disc loc board = if locFits loc then undefined else board 
 
--- Takes a locY and board and returns a row for processing
-getRow :: LocY -> Board -> Board
-getRow locY board = snd <$> filter f rowMap
-                  where 
-                    rowMap = mapList board 
-                    f = (\(key, _) -> (key == locY))
+-- playRow works fine 
+playRow :: Cell -> Location -> Board -> Board
+playRow Empty _ board = board 
+playRow disc (x, y) board = before ++ newRow ++ after
+                where
+                  before = snd <$> (takeWhile (\(key, _) -> (key < y)) $ mapList board)
+                  after  = snd <$> (dropWhile (\(key, _) -> (key <= y)) $ mapList board)
+                  newRow = (playHorizontal disc x) <$> (snd <$> (filter (\(key, _) -> (key == y)) $ mapList board))
 
 
 -- Takes a locX and board and returns a column for processing
+{--
 getCol :: LocX -> Board -> Board 
-getColumn locX board = snd <$> filter f columnMap
+getCol locX board = playHorizontal <$> snd <$> filter f columnMap
                      where 
                       columnMap = mapList $ transpose board
                       f = (\(key, _) -> (key == locX))
+--}
 
 locFits :: Location -> Bool
 locFits (locX, locY) = validLocX && validLocY 
