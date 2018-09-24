@@ -48,6 +48,9 @@ playRow disc (x, y) board = before ++ newRow ++ after
                   after  = snd <$> (dropWhile (\(key, _) -> (key <= y)) $ mapList board)
                   newRow = (playHorizontal disc x) <$> (snd <$> (filter (\(key, _) -> (key == y)) $ mapList board))
 
+playCol :: Cell -> Location -> Board -> Board  
+playCol disc (x, y) = transpose . (playRow disc (y, x)) . transpose
+
 
 -- Takes a locX and board and returns a column for processing
 {--
