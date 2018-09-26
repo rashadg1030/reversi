@@ -1,43 +1,59 @@
 module Main where
 
 import Data.List
+import qualified Data.Map.Strict as Map
 import Data.Functor
 
 main :: IO ()
 main = undefined
 
-data Cell = Black | White | Empty
-  deriving (Show, Eq)
+data Disc = Black | White
+    deriving (Show, Eq)
+  
+type Cell = Maybe Disc
+type Location = (Int, Int)
 
--- data Cell = B | W 
---  deriving (Show, Eq)
-
--- type Cell = Maybe Disc
-
-type Row = [Cell]
-
-type Board = [Row]
-
-type LocX = Int 
-type LocY = Int
-
-type Location = (LocX, LocY)
+type Board = Map.Map Location Disc
 
 startingBoard :: Board
-startingBoard = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, White],
-                 [Empty, Empty, Empty, Empty, Empty, Black, Empty, Empty],
-                 [Empty, Empty, Empty, White, Black, Empty, Empty, Empty],
-                 [Empty, Empty, Empty, Black, White, Empty, Empty, Empty],
-                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty]]
+startingBoard = Map.fromList [((3,3), White), ((4,3), Black), ((3,4), White), ((4,4), Black)]
 
+-- Creates a string representation of a cell.
+cellString :: Map.Map Location Disc -> String
+cellString = map (\loc key -> if ())
+           where
+
+cellString :: Cell -> String
+cellString Nothing = "   "
+celString Just 
+
+
+{--
+displayBoard :: Board -> IO ()
+displayBoard = putStr . (++) "\n---------------------------------\n" . boardString 
+
+-- Creates a string representation of a board.
+boardString :: Board -> String
+boardString []     = "ERR: INVALID BOARD"
+boardString [x]    = rowString x
+boardString (x:xs) = rowString x ++ boardString xs 
+
+-- Creates a string representation of a row.
+rowString :: Row -> String
+rowString []     = "ERR: INVALID ROW"
+rowString [x]    = cellString x ++ "|\n---------------------------------\n"
+rowString (x:xs) = cellString x ++ rowString xs
+--}
+
+
+{--
 -- Make play vertically and horizontally
 playXY :: Cell -> Location -> Board -> Board
 playXY Empty _ board = board
 playXY _ _ [] = []
-playXY disc loc board = if locFits loc then undefined else board 
+playXY disc loc@(x, y) board = if isEmpty then ((changeCell disc loc) . (playCol disc loc) . (changeCell Empty loc) . (playRow disc loc)) board else board 
+                            where
+                              isEmpty = checkLocX x $ head $ snd <$> (dropWhile (\(key, _) -> (key < y)) $ mapList board)
 
 -- playRow works fine 
 playRow :: Cell -> Location -> Board -> Board
@@ -51,6 +67,13 @@ playRow disc (x, y) board = before ++ newRow ++ after
 playCol :: Cell -> Location -> Board -> Board  
 playCol disc (x, y) = transpose . (playRow disc (y, x)) . transpose
 
+-- Helper function for playHorizontal that checks if LocX is an Empty cell
+checkLocX :: LocX -> Row -> Bool
+checkLocX locX row = (length emptyCellAndMatch) > 0
+                  where 
+                    cellMap = mapList row
+                    emptyCellMap = filter isEmptyCell cellMap
+                    emptyCellAndMatch = filter (\(fst, snd) -> fst == locX) emptyCellMap 
 
 -- Takes a locX and board and returns a column for processing
 {--
@@ -79,28 +102,6 @@ columnToRow locX board  = undefined --take 1 $ dropWhile (\(key, column) -> not 
                         columns = transpose board
                         columnMap = mapList columns
 --}
-
-displayBoard :: Board -> IO ()
-displayBoard = putStr . (++) "\n---------------------------------\n" . boardString 
-
--- Creates a string representation of a board.
-boardString :: Board -> String
-boardString []     = "ERR: INVALID BOARD"
-boardString [x]    = rowString x
-boardString (x:xs) = rowString x ++ boardString xs 
-
--- Creates a string representation of a row.
-rowString :: Row -> String
-rowString []     = "ERR: INVALID ROW"
-rowString [x]    = cellString x ++ "|\n---------------------------------\n"
-rowString (x:xs) = cellString x ++ rowString xs
-
--- Creates a string representation of a cell.
-cellString :: Cell -> String
-cellString Empty = "|   "
-cellString Black = "| B "
-cellString White = "| W "
-
 -- For changing a cell on the board.
 changeCell :: Cell -> Location -> Board -> Board
 changeCell cell (locX, locY) board = [if key == locY then (changeCellRow cell locX row) else row | (key, row) <- (mapList board)]
@@ -127,6 +128,18 @@ isWhiteDisc :: Cell -> Bool
 isWhiteDisc White = True
 isWhiteDisc _     = False
 
+playHorizontal :: Cell -> LocX -> Row -> Row
+playHorizontal Empty _ row   = row
+playHorizontal disc locX row = if canPlay then newLeft ++ [disc] ++ newRight else row
+                              where  
+                                left          =  reverse $ fst $ shaveRow locX row
+                                right         =  snd $ shaveRow locX row
+                                leftDivided   =  divideRow disc left
+                                rightDivided  =  divideRow disc right
+                                newLeft       = reverse $ flipCaptured leftDivided
+                                newRight      = flipCaptured rightDivided
+                                canPlay       = (checkRowPair leftDivided) || (checkRowPair rightDivided)
+
 {--
   Thee following functions are helper functions for checking a valid play on the board.
 --}
@@ -138,6 +151,7 @@ before the play cell, and one consisting of cells coming after it.
   shaveRow locX = drop $ locX + 1  
 --}
 
+{--
 playHorizontal :: Cell -> LocX -> Row -> Row
 playHorizontal Empty _ row   = row
 playHorizontal disc locX row = if checkLocX locX row then (if canPlay then newLeft ++ [disc] ++ newRight else row) else row
@@ -149,17 +163,7 @@ playHorizontal disc locX row = if checkLocX locX row then (if canPlay then newLe
                                 newLeft       = reverse $ flipCaptured leftDivided
                                 newRight      = flipCaptured rightDivided
                                 canPlay       = (checkRowPair leftDivided) || (checkRowPair rightDivided)
-
--- Helper function for playHorizontal that checks if LocX is an Empty cell
-checkLocX :: LocX -> Row -> Bool
-checkLocX locX row = (length emptyCellAndMatch) > 0
-                  where 
-                    cellMap = mapList row
-                    emptyCellMap = filter isEmptyCell cellMap
-                    emptyCellAndMatch = filter (\(fst, snd) -> fst == locX) emptyCellMap 
-
-
-
+--}
 -- Not really shaving, but I don't have a better name. This splits the row into two rows. First step.
 -- Reverse the row that is on the left of the play cell so that it can be checked properly.
 shaveRow :: LocX -> Row -> (Row, Row)
@@ -212,5 +216,5 @@ checkRight :: Cell -> LocX -> Row -> Cell
 checkRight disc locX row = rightOfLocX
   where rightOfLocX = drop locX row
 --}
-
+--}
 

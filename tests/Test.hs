@@ -65,3 +65,6 @@ checkRowPair $ divideRow White [Black, Black, Black, Black, Black, White]
 checkRowPair $ divideRow Black [White, White, Black, White, White, White]
 checkRowPair $ divideRow Black [White, Black, Black, White, White]
 --}
+
+-- playXY White (3,5) startingBoard
+-- playXY Black (2,3) (playXY White (3,5) startingBoard)
