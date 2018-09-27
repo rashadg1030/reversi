@@ -2,6 +2,7 @@ module Main where
 
 import Data.List
 import qualified Data.Map.Strict as Map
+import Data.Map.Strict (Map)
 import Data.Functor
 
 main :: IO ()
@@ -11,22 +12,48 @@ data Disc = Black | White
     deriving (Show, Eq)
   
 type Cell = Maybe Disc
+
 type Location = (Int, Int)
 
-type Board = Map.Map Location Disc
+type Board = Map Location Disc
 
-startingBoard :: Board
-startingBoard = Map.fromList [((3,3), White), ((4,3), Black), ((3,4), White), ((4,4), Black)]
+displayBoard :: Board -> IO ()
+displayBoard board = putStr step4
+                   where 
+                    step1 = boardToCells board
+                    step2 = mapCells step1
+                    step3 = cellMapToString step2
+                    step4 = capBoardString step3
+                      
+capBoardString :: String -> String 
+capBoardString x = "---------------------------------\n" ++ x
 
--- Creates a string representation of a cell.
-cellString :: Map.Map Location Disc -> String
-cellString = map (\loc key -> if ())
-           where
+cellMapToString :: [((Int, Int), Cell)] -> String
+cellMapToString [] = ""
+cellMapToString (((x, y), c):tail) = (if x == 7 then (cellToString c) ++ "|\n---------------------------------\n" else cellToString c) ++ cellMapToString tail
 
-cellString :: Cell -> String
-cellString Nothing = "   "
-celString Just 
+cellToString :: Cell -> String
+cellToString (Nothing)    = "|   " 
+cellToString (Just Black) = "| B "
+cellToString (Just White) = "| W " 
 
+mapCells :: [Cell] -> [((Int, Int), Cell)]
+mapCells = (zip genKeys)
+
+boardToCells :: Board -> [Cell]
+boardToCells board = map (lookup' board) genKeys
+
+lookup' :: Ord k => Map k a -> k -> Maybe a
+lookup' = flip Map.lookup
+
+startingBoard :: Board 
+startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4), White)]
+
+makeBoard :: [((Int, Int), Disc)] -> Board
+makeBoard = Map.fromList
+
+genKeys :: [(Int, Int)]
+genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
 {--
 displayBoard :: Board -> IO ()
