@@ -8,6 +8,8 @@ import Data.Functor
 main :: IO ()
 main = undefined
 
+-- Data
+
 data Disc = Black | White
     deriving (Show, Eq)
   
@@ -17,16 +19,19 @@ type Location = (Int, Int)
 
 type Board = Map Location Disc
 
-displayBoard :: Board -> IO ()
-displayBoard board = putStr step4
+-- Functions
+
+-- For displaying boards
+putBoard :: Board -> IO ()
+putBoard board = putStr step4
                    where 
                     step1 = boardToCells board
                     step2 = mapCells step1
                     step3 = cellMapToString step2
-                    step4 = capBoardString step3
-                      
-capBoardString :: String -> String 
-capBoardString x = "---------------------------------\n" ++ x
+                    step4 = capBoard step3
+
+capBoard :: String -> String 
+capBoard x = "---------------------------------\n" ++ x
 
 cellMapToString :: [((Int, Int), Cell)] -> String
 cellMapToString [] = ""
@@ -47,7 +52,7 @@ lookup' :: Ord k => Map k a -> k -> Maybe a
 lookup' = flip Map.lookup
 
 startingBoard :: Board 
-startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4), White)]
+startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4), White), ((5,3), White), ((7,4), Black)]
 
 makeBoard :: [((Int, Int), Disc)] -> Board
 makeBoard = Map.fromList
@@ -55,23 +60,32 @@ makeBoard = Map.fromList
 genKeys :: [(Int, Int)]
 genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
-{--
-displayBoard :: Board -> IO ()
-displayBoard = putStr . (++) "\n---------------------------------\n" . boardString 
+-- Functions for creating a list of all possible moves for a given color of disc
+validMoves :: Disc -> Board -> [Location]
+validMoves disc board = undefined
 
--- Creates a string representation of a board.
-boardString :: Board -> String
-boardString []     = "ERR: INVALID BOARD"
-boardString [x]    = rowString x
-boardString (x:xs) = rowString x ++ boardString xs 
+isValidMove :: Disc -> Location -> Board -> Bool
+isValidMove disc loc@(x, y) board
+  | (isInside loc) && (isEmptyCell $ getCell loc board) = answer                                  
+  | otherwise                                           = False
+                                                        where 
+                                                          answer = undefined
 
--- Creates a string representation of a row.
-rowString :: Row -> String
-rowString []     = "ERR: INVALID ROW"
-rowString [x]    = cellString x ++ "|\n---------------------------------\n"
-rowString (x:xs) = cellString x ++ rowString xs
---}
+getRow :: Int -> Board -> Board
+getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
 
+getColumn :: Int -> Board -> Board 
+getColumn locX board = Map.filterWithKey (\(x, y) _ -> x == locX) board
+
+isEmptyCell :: Cell -> Bool
+isEmptyCell Nothing = True
+isEmptyCell _       = False
+
+isInside :: Location -> Bool
+isInside (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
+
+getCell :: Location -> Board -> Cell
+getCell = Map.lookup 
 
 {--
 -- Make play vertically and horizontally
