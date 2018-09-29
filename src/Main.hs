@@ -71,6 +71,7 @@ isValidMove disc loc@(x, y) board
                                                         where 
                                                           answer = undefined
 
+
 getRow :: Int -> Board -> Board
 getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
 
