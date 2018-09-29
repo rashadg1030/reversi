@@ -71,7 +71,18 @@ genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
 -- Functions for creating a list of all possible moves for a given color of disc
 checkMoveDiago :: Disc -> Location -> Board -> Bool
-checkMoveDiago = undefined
+checkMoveDiago disc loc board = or [(isValidMoveMajor disc loc board), (isValidMoveMinor disc loc board)]
+
+isValidMoveMinor :: Disc -> Location -> Board -> Bool 
+isValidMoveMinor disc loc@(x, y) board = if isValidLoc loc board then answer else False 
+                                       where
+                                        answer = condition1 || condition2
+                                        preceding = reverse $ precedingCellsMinor loc board
+                                        following = followingCellsMinor loc board
+                                        precedingCaptured = getCaptured (Just disc) preceding
+                                        followingCaptured = getCaptured (Just disc) following
+                                        condition1 = validateCaptured precedingCaptured
+                                        condition2 = validateCaptured followingCaptured
 
 isValidMoveMajor :: Disc -> Location -> Board -> Bool 
 isValidMoveMajor disc loc@(x, y) board = if isValidLoc loc board then answer else False
@@ -83,9 +94,6 @@ isValidMoveMajor disc loc@(x, y) board = if isValidLoc loc board then answer els
                                       followingCaptured = getCaptured (Just disc) following
                                       condition1 = validateCaptured precedingCaptured
                                       condition2 = validateCaptured followingCaptured
-
-isValidMoveMinor :: Disc -> Location -> Board -> Bool
-isValidMoveMinor disc loc@(x, y) board = undefined
 
 checkMoveOrtho :: Disc -> Location -> Board -> Bool 
 checkMoveOrtho disc loc board = or [(isValidMoveRow disc loc board), (isValidMoveCol disc loc board)]
