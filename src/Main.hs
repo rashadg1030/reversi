@@ -33,7 +33,7 @@ putBoard board = putStr step4
 capBoard :: String -> String 
 capBoard x = "---------------------------------\n" ++ x
 
-cellMapToString :: [((Int, Int), Cell)] -> String
+cellMapToString :: [(Location, Cell)] -> String
 cellMapToString [] = ""
 cellMapToString (((x, y), c):tail) = (if x == 7 then (cellToString c) ++ "|\n---------------------------------\n" else cellToString c) ++ cellMapToString tail
 
@@ -42,7 +42,7 @@ cellToString (Nothing)    = "|   "
 cellToString (Just Black) = "| B "
 cellToString (Just White) = "| W " 
 
-mapCells :: [Cell] -> [((Int, Int), Cell)]
+mapCells :: [Cell] -> [(Location, Cell)]
 mapCells = (zip genKeys)
 
 boardToCells :: Board -> [Cell]
@@ -54,25 +54,37 @@ lookup' = flip Map.lookup
 startingBoard :: Board 
 startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4), White), ((5,3), White), ((7,4), Black)]
 
-makeBoard :: [((Int, Int), Disc)] -> Board
+makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
 
-genKeys :: [(Int, Int)]
+genKeys :: [Location]
 genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
 -- Functions for creating a list of all possible moves for a given color of disc
 validMoves :: Disc -> Board -> [Location]
 validMoves disc board = undefined
 
+isValidMoveRow :: Disc -> Location -> Board -> Bool
+isValidMoveRow disc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc), (beforeKeys afterKeys)]
+
+beforeCells :: Location -> Board -> [Cell]
+beforeCells = map (lookup' board) beforeKeys
+
+beforeKeys :: [Location]
+beforeKeys = zip [0..x] (repeat y)
+                                      
+
+getRow :: Int -> Board -> Board
+getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
+
 isValidMove :: Disc -> Location -> Board -> Bool
-isValidMove disc loc@(x, y) board
-  | (isInside loc) && (isEmptyCell $ getCell loc board) = answer                                  
-  | otherwise                                           = False
-                                                        where 
-                                                          answer = undefined
+isValidMove disc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc), ]
+
+isInside :: Location -> Bool
+isInside (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
+
 isOpenLoc :: Location -> Board -> Bool
 isOpenLoc loc board = isEmptyCell $ getCell loc board
-
 
 getCell :: Location -> Board -> Cell
 getCell = Map.lookup 
@@ -81,14 +93,8 @@ isEmptyCell :: Cell -> Bool
 isEmptyCell Nothing = True
 isEmptyCell _       = False
 
-getRow :: Int -> Board -> Board
-getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
-
 getColumn :: Int -> Board -> Board 
 getColumn locX board = Map.filterWithKey (\(x, y) _ -> x == locX) board
-
-isInside :: Location -> Bool
-isInside (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
 
 {--
 -- Make play vertically and horizontally
