@@ -61,7 +61,6 @@ testBoard1 = makeBoard [((3,3), White), ((4,3), White), ((5,3), White), ((3,4), 
 testBoard2 :: Board 
 testBoard2 = makeBoard [((3,3), White), ((4,3), White), ((3,4), Black), ((4,4), Black), ((5,4), Black), ((4,5), White), ((4,6), White)]
 
-
 makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
 
@@ -73,19 +72,62 @@ validMoves :: Disc -> Board -> [Location]
 validMoves disc board = undefined
 
 isValidMoveRow :: Disc -> Location -> Board -> Bool
-isValidMoveRow disc loc@(x, y) board = undefined --and [(isOpenLoc loc board), (isInside loc), (beforeKeys afterKeys)]
+isValidMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else False
+                                     where 
+                                      answer            = condition1 || condition2
+                                      preceding         = reverse $ precedingCells loc board
+                                      following         = followingCells loc board
+                                      precedingCaptured = getCaptured (Just disc) preceding
+                                      followingCaptured = getCaptured (Just disc) following
+                                      condition1        = validateCaptured precedingCaptured 
+                                      condition2        = validateCaptured followingCaptured
 
-beforeCells :: Location -> Board -> [Cell]
-beforeCells location board = map (lookup' board) (beforeKeys location)
+validateCaptured :: ([Cell], [Cell]) -> Bool                                       
+validateCaptured ([], _)        = False
+validateCaptured (captured, []) = False
+validateCaptured ((c:cs), (t:ts)) = isOppositeCell c t
 
-beforeKeys :: Location -> [Location]
-beforeKeys (x, y) = zip [0..x] (repeat y)
+{--
+-- Then based on the pair of rows, decide if play is valid or not.
+-- Might not need?
+checkRowPair :: (Row, Row) -> Bool
+checkRowPair ([], [])         = False
+checkRowPair ([], tail)       = False
+checkRowPair (captured, [])   = False
+checkRowPair ((c:cs), (t:ts)) = isOppositeCell c t
+--}
+
+getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
+getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
+
+{--
+-- Then, divide the shaved row into two rows according to color of disc that is being played.
+divideRow :: Cell -> Row -> (Row, Row)
+divideRow measure row = ((takeWhile (isOppositeCell measure) row), (dropWhile (isOppositeCell measure) row))
+--}
+
+isOppositeCell :: Cell -> Cell -> Bool
+isOppositeCell Nothing _    = False
+isOppositeCell _ Nothing    = False
+isOppositeCell x y          = not (x == y) 
+ 
+followingCells :: Location -> Board -> [Cell]
+followingCells location board = map (lookup' board) (followingKeys location)
+                          where
+                            followingKeys :: Location -> [Location]
+                            followingKeys (x, y) = zip [(x+1)..7] (repeat y) 
+
+precedingCells :: Location -> Board -> [Cell]
+precedingCells location board = map (lookup' board) (precedingKeys location)
+                           where
+                             precedingKeys :: Location -> [Location]
+                             precedingKeys (x, y) = zip [0..(x-1)] (repeat y)
                                       
 getRow :: Int -> Board -> Board
 getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
 
-isValidMove :: Disc -> Location -> Board -> Bool
-isValidMove disc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc)]
+isValidLoc :: Location -> Board -> Bool
+isValidLoc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc)]
 
 isInside :: Location -> Bool
 isInside (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
