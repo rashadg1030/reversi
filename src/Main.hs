@@ -51,8 +51,16 @@ boardToCells board = map (lookup' board) genKeys
 lookup' :: Ord k => Map k a -> k -> Maybe a
 lookup' = flip Map.lookup
 
+-- Test boards for testing different game states
 startingBoard :: Board 
-startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4), White), ((5,3), White), ((7,4), Black)]
+startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4), White)]
+
+testBoard1 :: Board 
+testBoard1 = makeBoard [((3,3), White), ((4,3), White), ((5,3), White), ((3,4), Black), ((4,4), White)]
+
+testBoard2 :: Board 
+testBoard2 = makeBoard [((3,3), White), ((4,3), White), ((3,4), Black), ((4,4), Black), ((5,4), Black), ((4,5), White), ((4,6), White)]
+
 
 makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
@@ -65,20 +73,19 @@ validMoves :: Disc -> Board -> [Location]
 validMoves disc board = undefined
 
 isValidMoveRow :: Disc -> Location -> Board -> Bool
-isValidMoveRow disc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc), (beforeKeys afterKeys)]
+isValidMoveRow disc loc@(x, y) board = undefined --and [(isOpenLoc loc board), (isInside loc), (beforeKeys afterKeys)]
 
 beforeCells :: Location -> Board -> [Cell]
-beforeCells = map (lookup' board) beforeKeys
+beforeCells location board = map (lookup' board) (beforeKeys location)
 
-beforeKeys :: [Location]
-beforeKeys = zip [0..x] (repeat y)
+beforeKeys :: Location -> [Location]
+beforeKeys (x, y) = zip [0..x] (repeat y)
                                       
-
 getRow :: Int -> Board -> Board
 getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
 
 isValidMove :: Disc -> Location -> Board -> Bool
-isValidMove disc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc), ]
+isValidMove disc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc)]
 
 isInside :: Location -> Bool
 isInside (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
