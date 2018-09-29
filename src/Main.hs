@@ -84,16 +84,8 @@ isValidMoveMajor disc loc@(x, y) board = if isValidLoc loc board then answer els
                                       condition1 = validateCaptured precedingCaptured
                                       condition2 = validateCaptured followingCaptured
 
-{--
-                                       where 
-                                        answer = condition1 || condition2
-                                        preceding = reverse $ precedingCellsCol loc board
-                                        following = followingCellsCol loc board
-                                        precedingCaptured = getCaptured (Just disc) preceding
-                                        followingCaptured = getCaptured (Just disc) following
-                                        condition1 = validateCaptured precedingCaptured
-                                        condition2 = validateCaptured followingCaptured   
---}
+isValidMoveMinor :: Disc -> Location -> Board -> Bool
+isValidMoveMinor disc loc@(x, y) board = undefined
 
 checkMoveOrtho :: Disc -> Location -> Board -> Bool 
 checkMoveOrtho disc loc board = or [(isValidMoveRow disc loc board), (isValidMoveCol disc loc board)]
@@ -133,6 +125,22 @@ isOppositeCell Nothing _    = False
 isOppositeCell _ Nothing    = False
 isOppositeCell x y          = not (x == y)
 
+followingCellsMinor :: Location -> Board -> [Cell]
+followingCellsMinor location board = map (lookup' board) (followingKeysMinor location)
+
+followingKeysMinor :: Location -> [Location]
+followingKeysMinor loc@(x, y) = answer
+                              where
+                                endLoc = findEndMinor loc
+                                endX = fst endLoc 
+                                endY = snd endLoc 
+                                listX = [(x+1)..endX]
+                                listY = reverse $ [endY..(y-1)]
+                                answer = zip listX listY      
+
+findEndMinor :: Location -> Location
+findEndMinor loc@(x, y) = if isEdge loc then loc else findEndMinor (x+1, y-1)
+
 followingCellsMajor :: Location -> Board -> [Cell]
 followingCellsMajor location board = map (lookup' board) (followingKeysMajor location)
 
@@ -157,9 +165,26 @@ followingCellsCol location board = map (lookup' board) (followingKeysCol locatio
 
 followingCellsRow :: Location -> Board -> [Cell]
 followingCellsRow location board = map (lookup' board) (followingKeysRow location)
-                          where
-                            followingKeysRow :: Location -> [Location]
-                            followingKeysRow (x, y) = zip [(x+1)..7] (repeat y) 
+                                 where
+                                  followingKeysRow :: Location -> [Location]
+                                  followingKeysRow (x, y) = zip [(x+1)..7] (repeat y) 
+
+-- Must be flipped like every other preceding function
+precedingCellsMinor :: Location -> Board -> [Cell]
+precedingCellsMinor location board = map (lookup' board) (precedingKeysMinor location)
+
+precedingKeysMinor :: Location -> [Location]
+precedingKeysMinor loc@(x, y) = answer
+                              where 
+                                startLoc = findStartMinor loc
+                                startX = fst startLoc
+                                startY = snd startLoc
+                                listX = [startX..(x-1)]
+                                listY = reverse $ [(y+1)..startY]
+                                answer = zip listX listY
+
+findStartMinor :: Location -> Location
+findStartMinor loc@(x, y) = if isEdge loc then loc else findStartMinor (x-1, y+1) 
 
 precedingCellsMajor :: Location -> Board -> [Cell]
 precedingCellsMajor location board = map (lookup' board) (precedingKeysMajor location)
