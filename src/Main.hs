@@ -71,10 +71,19 @@ genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 validMovesXY :: Disc -> Board -> [Location]
 validMovesXY disc board = undefined
 
+isValidMoveXY :: Disc -> Location -> Board -> Bool 
+isValidMoveXY disc loc board = or [(isValidMoveRow disc loc board), (isValidMoveCol disc loc board)]
+
 isValidMoveCol :: Disc -> Location -> Board -> Bool
 isValidMoveCol disc loc@(x, y) board = if isValidLoc loc board then answer else False 
                                        where 
-                                        answer = undefined
+                                        answer = condition1 || condition2
+                                        preceding = reverse $ precedingCellsCol loc board
+                                        following = followingCellsCol loc board
+                                        precedingCaptured = getCaptured (Just disc) preceding
+                                        followingCaptured = getCaptured (Just disc) following
+                                        condition1 = validateCaptured precedingCaptured
+                                        condition2 = validateCaptured followingCaptured   
 
 isValidMoveRow :: Disc -> Location -> Board -> Bool
 isValidMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else False
@@ -104,7 +113,7 @@ followingCellsCol :: Location -> Board -> [Cell]
 followingCellsCol location board = map (lookup' board) (followingKeysCol location)
                                  where 
                                   followingKeysCol :: Location -> [Location]
-                                  followingKeysCol (x, y) = zip (repeat x) [(x+1)..7]                                     
+                                  followingKeysCol (x, y) = zip (repeat x) [(y+1)..7]                                     
 
 followingCellsRow :: Location -> Board -> [Cell]
 followingCellsRow location board = map (lookup' board) (followingKeysRow location)
@@ -114,15 +123,15 @@ followingCellsRow location board = map (lookup' board) (followingKeysRow locatio
 
 precedingCellsCol :: Location -> Board -> [Cell] 
 precedingCellsCol location board = map (lookup' board) (precedingKeysCol location)
-                            where
-                              precedingKeysCol :: Location -> [Location]
-                              precedingKeysCol (x, y) = zip (repeat x) [0..(x-1)] 
+                                 where
+                                   precedingKeysCol :: Location -> [Location]
+                                   precedingKeysCol (x, y) = zip (repeat x) [0..(y-1)] 
                             
 precedingCellsRow :: Location -> Board -> [Cell]
 precedingCellsRow location board = map (lookup' board) (precedingKeysRow location)
-                           where
-                             precedingKeysRow :: Location -> [Location]
-                             precedingKeysRow (x, y) = zip [0..(x-1)] (repeat y)
+                                 where
+                                   precedingKeysRow :: Location -> [Location]
+                                   precedingKeysRow (x, y) = zip [0..(x-1)] (repeat y)
                                       
 getRow :: Int -> Board -> Board
 getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
