@@ -70,10 +70,33 @@ genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
 
 -- Functions for creating a list of all possible moves for a given color of disc
+checkMoveDiago :: Disc -> Location -> Board -> Bool
+checkMoveDiago = undefined
 
+isValidMoveMajor :: Disc -> Location -> Board -> Bool 
+isValidMoveMajor disc loc@(x, y) board = if isValidLoc loc board then answer else False
+                                     where 
+                                      answer = condition1 || condition2
+                                      preceding = reverse $ precedingCellsMajor loc board
+                                      following = followingCellsMajor loc board 
+                                      precedingCaptured = getCaptured (Just disc) preceding
+                                      followingCaptured = getCaptured (Just disc) following
+                                      condition1 = validateCaptured precedingCaptured
+                                      condition2 = validateCaptured followingCaptured
 
-isValidMoveXY :: Disc -> Location -> Board -> Bool 
-isValidMoveXY disc loc board = or [(isValidMoveRow disc loc board), (isValidMoveCol disc loc board)]
+{--
+                                       where 
+                                        answer = condition1 || condition2
+                                        preceding = reverse $ precedingCellsCol loc board
+                                        following = followingCellsCol loc board
+                                        precedingCaptured = getCaptured (Just disc) preceding
+                                        followingCaptured = getCaptured (Just disc) following
+                                        condition1 = validateCaptured precedingCaptured
+                                        condition2 = validateCaptured followingCaptured   
+--}
+
+checkMoveOrtho :: Disc -> Location -> Board -> Bool 
+checkMoveOrtho disc loc board = or [(isValidMoveRow disc loc board), (isValidMoveCol disc loc board)]
 
 isValidMoveCol :: Disc -> Location -> Board -> Bool
 isValidMoveCol disc loc@(x, y) board = if isValidLoc loc board then answer else False 
@@ -122,25 +145,9 @@ followingKeysMajor loc@(x, y) = answer
                                 listX  = [(x+1)..endX]
                                 listY  = [(y+1)..endY]
                                 answer = zip listX listY
-{--
-precedingKeysMajor :: Location -> [Location]
-precedingKeysMajor loc@(x, y) = answer
-                          where
-                            startLoc  = findStartMajor loc 
-                            startX = fst startLoc
-                            startY = snd startLoc 
-                            listX  = [startX..(x-1)]
-                            listY  = [startY..(y-1)]
-                            answer = zip listX listY
---}
 
 findEndMajor :: Location -> Location 
 findEndMajor loc@(x, y) = if isEdge loc then loc else findEndMajor (x+1, y+1)
-
-{--
-findStartMajor :: Location -> Location
-findStartMajor loc@(x, y) = if isEdge loc then loc else findStartMajor (x-1, y-1)
---}
 
 followingCellsCol :: Location -> Board -> [Cell]
 followingCellsCol location board = map (lookup' board) (followingKeysCol location)
@@ -171,7 +178,7 @@ findStartMajor :: Location -> Location
 findStartMajor loc@(x, y) = if isEdge loc then loc else findStartMajor (x-1, y-1)
 
 isEdge :: Location -> Bool
-isEdge (x, y) = x == 0 || y == 0 
+isEdge (x, y) = or [(x == 0 || y == 0), (x == 7 || y == 7)] 
 
 precedingCellsCol :: Location -> Board -> [Cell] 
 precedingCellsCol location board = map (lookup' board) (precedingKeysCol location)
