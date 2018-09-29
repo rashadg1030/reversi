@@ -70,7 +70,16 @@ isValidMove disc loc@(x, y) board
   | otherwise                                           = False
                                                         where 
                                                           answer = undefined
+isOpenLoc :: Location -> Board -> Bool
+isOpenLoc loc board = isEmptyCell $ getCell loc board
 
+
+getCell :: Location -> Board -> Cell
+getCell = Map.lookup 
+                                            
+isEmptyCell :: Cell -> Bool
+isEmptyCell Nothing = True
+isEmptyCell _       = False
 
 getRow :: Int -> Board -> Board
 getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
@@ -78,15 +87,8 @@ getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
 getColumn :: Int -> Board -> Board 
 getColumn locX board = Map.filterWithKey (\(x, y) _ -> x == locX) board
 
-isEmptyCell :: Cell -> Bool
-isEmptyCell Nothing = True
-isEmptyCell _       = False
-
 isInside :: Location -> Bool
 isInside (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
-
-getCell :: Location -> Board -> Cell
-getCell = Map.lookup 
 
 {--
 -- Make play vertically and horizontally
