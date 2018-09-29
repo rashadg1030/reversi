@@ -67,9 +67,10 @@ makeBoard = Map.fromList
 genKeys :: [Location]
 genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
+
+
 -- Functions for creating a list of all possible moves for a given color of disc
-validMovesXY :: Disc -> Board -> [Location]
-validMovesXY disc board = undefined
+
 
 isValidMoveXY :: Disc -> Location -> Board -> Bool 
 isValidMoveXY disc loc board = or [(isValidMoveRow disc loc board), (isValidMoveCol disc loc board)]
@@ -109,6 +110,38 @@ isOppositeCell Nothing _    = False
 isOppositeCell _ Nothing    = False
 isOppositeCell x y          = not (x == y)
 
+followingCellsMajor :: Location -> Board -> [Cell]
+followingCellsMajor location board = map (lookup' board) (followingKeysMajor location)
+
+followingKeysMajor :: Location -> [Location]
+followingKeysMajor loc@(x, y) = answer 
+                              where
+                                endLoc = findEndMajor loc 
+                                endX   = fst endLoc 
+                                endY   = snd endLoc 
+                                listX  = [(x+1)..endX]
+                                listY  = [(y+1)..endY]
+                                answer = zip listX listY
+{--
+precedingKeysMajor :: Location -> [Location]
+precedingKeysMajor loc@(x, y) = answer
+                          where
+                            startLoc  = findStartMajor loc 
+                            startX = fst startLoc
+                            startY = snd startLoc 
+                            listX  = [startX..(x-1)]
+                            listY  = [startY..(y-1)]
+                            answer = zip listX listY
+--}
+
+findEndMajor :: Location -> Location 
+findEndMajor loc@(x, y) = if isEdge loc then loc else findEndMajor (x+1, y+1)
+
+{--
+findStartMajor :: Location -> Location
+findStartMajor loc@(x, y) = if isEdge loc then loc else findStartMajor (x-1, y-1)
+--}
+
 followingCellsCol :: Location -> Board -> [Cell]
 followingCellsCol location board = map (lookup' board) (followingKeysCol location)
                                  where 
@@ -120,6 +153,25 @@ followingCellsRow location board = map (lookup' board) (followingKeysRow locatio
                           where
                             followingKeysRow :: Location -> [Location]
                             followingKeysRow (x, y) = zip [(x+1)..7] (repeat y) 
+
+precedingCellsMajor :: Location -> Board -> [Cell]
+precedingCellsMajor location board = map (lookup' board) (precedingKeysMajor location)
+                                   --where
+precedingKeysMajor :: Location -> [Location]
+precedingKeysMajor loc@(x, y) = answer
+                          where
+                            startLoc  = findStartMajor loc 
+                            startX = fst startLoc
+                            startY = snd startLoc 
+                            listX  = [startX..(x-1)]
+                            listY  = [startY..(y-1)]
+                            answer = zip listX listY 
+
+findStartMajor :: Location -> Location
+findStartMajor loc@(x, y) = if isEdge loc then loc else findStartMajor (x-1, y-1)
+
+isEdge :: Location -> Bool
+isEdge (x, y) = x == 0 || y == 0 
 
 precedingCellsCol :: Location -> Board -> [Cell] 
 precedingCellsCol location board = map (lookup' board) (precedingKeysCol location)
