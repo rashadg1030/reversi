@@ -64,12 +64,11 @@ testBoard2 = makeBoard [((3,3), White), ((4,3), White), ((3,4), Black), ((4,4), 
 makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
 
+-- For generating a list of all board locations
 genKeys :: [Location]
 genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
-
-
--- Functions for creating a list of all possible moves for a given color of disc
+-- Functions for creating a list of all possible moves for a given color of Disc
 possibleMoves :: Disc -> Board -> [Location]
 possibleMoves disc board = answer 
                          where
@@ -133,9 +132,6 @@ validateCaptured :: ([Cell], [Cell]) -> Bool
 validateCaptured ([], _)        = False
 validateCaptured (captured, []) = False
 validateCaptured ((c:cs), (t:ts)) = isOppositeCell c t
-
-getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
-getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
 
 isOppositeCell :: Cell -> Cell -> Bool
 isOppositeCell Nothing _    = False
@@ -233,9 +229,15 @@ precedingCellsRow location board = map (lookup' board) (precedingKeysRow locatio
                                  where
                                    precedingKeysRow :: Location -> [Location]
                                    precedingKeysRow (x, y) = zip [0..(x-1)] (repeat y)
-                                      
+{--           
+Don't need?
+                           
 getRow :: Int -> Board -> Board
 getRow locY board = Map.filterWithKey (\(x, y) _ -> y == locY) board
+
+getColumn :: Int -> Board -> Board 
+getColumn locX board = Map.filterWithKey (\(x, y) _ -> x == locX) board
+--}
 
 isValidLoc :: Location -> Board -> Bool
 isValidLoc loc@(x, y) board = and [(isOpenLoc loc board), (isInside loc)]
@@ -246,16 +248,28 @@ isInside (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
 isOpenLoc :: Location -> Board -> Bool
 isOpenLoc loc board = isEmptyCell $ getCell loc board
 
-getCell :: Location -> Board -> Cell
-getCell = Map.lookup 
-                                            
 isEmptyCell :: Cell -> Bool
 isEmptyCell Nothing = True
 isEmptyCell _       = False
 
-getColumn :: Int -> Board -> Board 
-getColumn locX board = Map.filterWithKey (\(x, y) _ -> x == locX) board
+getCell :: Location -> Board -> Cell
+getCell = Map.lookup 
 
+-- Functions for making a move and changing the board state to a new one if the move is valid
+flipCaptured :: ([Cell], [Cell]) -> [Cell]
+flipCaptured ([], [])                       = []
+flipCaptured ([], tail)                     = tail
+flipCaptured (captured, [])                 = captured
+flipCaptured (captured@(c:cs), tail@(t:ts)) = if isOppositeCell c t then (map flipDisc captured) ++ tail else captured ++ tail
+
+flipDisc :: Cell -> Cell
+flipDisc Nothing      = Nothing
+flipDisc (Just Black) = Just White
+flipDisc (Just White) = Just Black
+
+getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
+getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
+                                            
 {--
 -- Make play vertically and horizontally
 playXY :: Cell -> Location -> Board -> Board
