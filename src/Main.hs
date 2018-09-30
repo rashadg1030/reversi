@@ -70,6 +70,15 @@ genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
 
 -- Functions for creating a list of all possible moves for a given color of disc
+possibleMoves :: Disc -> Board -> [Location]
+possibleMoves disc board = answer 
+                         where
+                          sieve = (flip (checkMove disc)) board
+                          answer = filter sieve genKeys
+
+checkMove :: Disc -> Location -> Board -> Bool
+checkMove disc loc board = or [(checkMoveOrtho disc loc board), (checkMoveDiago disc loc board)]
+
 checkMoveDiago :: Disc -> Location -> Board -> Bool
 checkMoveDiago disc loc board = or [(isValidMoveMajor disc loc board), (isValidMoveMinor disc loc board)]
 
