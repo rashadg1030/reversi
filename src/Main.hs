@@ -3,6 +3,7 @@ module Main where
 import Data.List
 import qualified Data.Map.Strict as Map
 import Data.Map.Strict (Map)
+import Data.Maybe
 import Data.Functor
 
 main :: IO ()
@@ -182,7 +183,6 @@ followingCellsRow location board = map (lookup' board) (followingKeysRow locatio
                                   followingKeysRow :: Location -> [Location]
                                   followingKeysRow (x, y) = zip [(x+1)..7] (repeat y) 
 
--- Must be flipped like every other preceding function
 precedingCellsMinor :: Location -> Board -> [Cell]
 precedingCellsMinor location board = map (lookup' board) (precedingKeysMinor location)
 
@@ -255,7 +255,41 @@ isEmptyCell _       = False
 getCell :: Location -> Board -> Cell
 getCell = Map.lookup 
 
--- Functions for making a move and changing the board state to a new one if the move is valid
+-- Functions for making a move and changing the board state to a new one if the move is valid. 
+makeMoveRow :: Disc -> Location -> Board -> Board 
+makeMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else board
+                                  where 
+                                    preceding         = reverse $ precedingCellsRow loc board 
+                                    following         = followingCellsRow loc board
+                                    precedingCaptured = getCaptured (Just disc) preceding
+                                    followingCaptured = getCaptured (Just disc) following
+                                    precedingFlipped  = reverse $ flipCaptured precedingCaptured
+                                    followingFlipped  = flipCaptured followingCaptured
+                                    newCells1         = precedingFlipped ++ [Nothing] ++ followingFlipped
+                                    newCellMap2       = zip (getRowKeys loc) newCells1 
+                                    newCellMap3       = filter (\x -> not ((snd x) == Nothing)) newCellMap2 -- remove Nothing elements
+                                    newRowKeys        = map fst newCellMap3      -- Get the keys of the Just _ Cells 
+                                    newCells2         = map snd newCellMap3      -- Get Just _ Cells
+                                    newDiscs          = map fromJust newCells2   -- take every cell and make it a disc (unbox from Just "context") -- fromJust can throw an err :(
+                                    newRow            = makeBoard (zip newRowKeys newDiscs) -- make newRow from newRowKeys and newDiscs zipped together
+                                    answer            = Map.union newRow board  -- insert newRow into board using union
+                                      --insert :: Ord k => k -> a -> Map k a -> Map k a
+                                      --union :: Ord k => Map k a -> Map k a -> Map k a
+getRowKeys :: Location -> [Location]
+getRowKeys (x, y) = [(a, y) | a <- [0..7]]
+{--
+isValidMoveRow :: Disc -> Location -> Board -> Bool
+isValidMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else False
+                                     where 
+                                      answer            = condition1 || condition2
+                                      preceding         = reverse $ precedingCellsRow loc board
+                                      following         = followingCellsRow loc board
+                                      precedingCaptured = getCaptured (Just disc) preceding
+                                      followingCaptured = getCaptured (Just disc) following
+                                      condition1        = validateCaptured precedingCaptured 
+                                      condition2        = validateCaptured followingCaptured
+--}
+
 flipCaptured :: ([Cell], [Cell]) -> [Cell]
 flipCaptured ([], [])                       = []
 flipCaptured ([], tail)                     = tail
@@ -269,7 +303,6 @@ flipDisc (Just White) = Just Black
 
 getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
 getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
-                                            
 {--
 -- Make play vertically and horizontally
 playXY :: Cell -> Location -> Board -> Board
