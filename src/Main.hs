@@ -277,18 +277,6 @@ makeMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else boa
                                       --union :: Ord k => Map k a -> Map k a -> Map k a
 getRowKeys :: Location -> [Location]
 getRowKeys (x, y) = [(a, y) | a <- [0..7]]
-{--
-isValidMoveRow :: Disc -> Location -> Board -> Bool
-isValidMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else False
-                                     where 
-                                      answer            = condition1 || condition2
-                                      preceding         = reverse $ precedingCellsRow loc board
-                                      following         = followingCellsRow loc board
-                                      precedingCaptured = getCaptured (Just disc) preceding
-                                      followingCaptured = getCaptured (Just disc) following
-                                      condition1        = validateCaptured precedingCaptured 
-                                      condition2        = validateCaptured followingCaptured
---}
 
 flipCaptured :: ([Cell], [Cell]) -> [Cell]
 flipCaptured ([], [])                       = []
