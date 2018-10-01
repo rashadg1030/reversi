@@ -256,7 +256,25 @@ getCell :: Location -> Board -> Cell
 getCell = Map.lookup 
 
 -- Functions for making a move and changing the board state to a new one if the move is valid. 
-makeMoveRow :: Disc -> Location -> Board -> Board 
+makeMoveCol :: Disc -> Location -> Board -> Board 
+makeMoveCol disc loc@(x, y) board = if isValidLoc loc board then answer else board
+                                  where
+                                    preceding = reverse $ precedingCellsCol loc board
+                                    following = followingCellsCol loc board
+                                    precedingCaptured = getCaptured (Just disc) preceding
+                                    followingCaptured = getCaptured (Just disc) following
+                                    precedingFlipped  = reverse $ flipCaptured precedingCaptured
+                                    followingFlipped  = flipCaptured followingCaptured
+                                    newCells1         = precedingFlipped ++ [Nothing] ++ followingFlipped
+                                    newCellMap2       = zip (getColKeys loc) newCells1
+                                    newCellMap3       = filter (\x -> not ((snd x) == Nothing)) newCellMap2
+                                    newColKeys        = map fst newCellMap3
+                                    newCells2         = map snd newCellMap3
+                                    newDiscs          = map fromJust newCells2
+                                    newCol            = makeBoard (zip newColKeys newDiscs)
+                                    answer            = Map.union newCol board
+
+makeMoveRow :: Disc -> Location -> Board -> Board
 makeMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else board
                                   where 
                                     preceding         = reverse $ precedingCellsRow loc board 
@@ -275,6 +293,10 @@ makeMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else boa
                                     answer            = Map.union newRow board  -- insert newRow into board using union
                                       --insert :: Ord k => k -> a -> Map k a -> Map k a
                                       --union :: Ord k => Map k a -> Map k a -> Map k a
+
+getColKeys :: Location -> [Location]
+getColKeys (x, y) = [(x, b) | b <- [0..7]]                                      
+
 getRowKeys :: Location -> [Location]
 getRowKeys (x, y) = [(a, y) | a <- [0..7]]
 
