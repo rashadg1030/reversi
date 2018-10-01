@@ -288,15 +288,15 @@ getCell = Map.lookup
 makeMoveMinor :: Disc -> Location -> Board -> Board
 makeMoveMinor disc loc@(x, y) board = if isValidLoc loc board then answer else board
                                     where 
-                                      preceding = reverse $ precedingCellsMinor loc board
-                                      following = followingCellsMinor loc board
+                                      preceding         = reverse $ precedingCellsMinor loc board
+                                      following         = followingCellsMinor loc board
                                       precedingCaptured = getCaptured (Just disc) preceding
                                       followingCaptured = getCaptured (Just disc) following 
                                       precedingFlipped  = reverse $ flipCaptured precedingCaptured
                                       followingFlipped  = flipCaptured followingCaptured
                                       newCells1         = precedingFlipped ++ [Nothing] ++ followingFlipped 
-                                      newCellsMap2      = zip (getMinorKeys loc) newCells1
-                                      newCellsMap3      = filter (\x -> not((snd x) == Nothing)) newCellMap2
+                                      newCellMap2       = zip (getMinorKeys loc) newCells1
+                                      newCellMap3       = filter (\x -> not ((snd x) == Nothing)) newCellMap2
                                       newMinorKeys      = map fst newCellMap3
                                       newCells2         = map snd newCellMap3
                                       newDiscs          = map fromJust newCells2
@@ -362,9 +362,12 @@ makeMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else boa
                                       --insert :: Ord k => k -> a -> Map k a -> Map k a
                                       --union :: Ord k => Map k a -> Map k a -> Map k a
 getMinorKeys :: Location -> [Location] 
-getMinorKeys loc@(x, y) = zip [ a | a <- [startX..endX]] [ b | b <- [startY..endY]]
+getMinorKeys loc@(x, y) = zip [ a | a <- [startX..endX]] $ reverse $ [ b | b <- [endY..startY]]
                         where
-                          
+                          startX = fst $ findStartMinor loc
+                          endX   = fst $ findEndMinor loc
+                          startY = snd $ findStartMinor loc
+                          endY   = snd $ findEndMinor loc
 
 getMajorKeys :: Location -> [Location]
 getMajorKeys loc@(x, y) = zip [ a | a <- [startX..endX]] [ b | b <- [startY..endY]]
