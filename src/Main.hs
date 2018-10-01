@@ -285,6 +285,10 @@ getCell :: Location -> Board -> Cell
 getCell = Map.lookup 
 
 -- Functions for making a move and changing the board state to a new one if the move is valid. 
+makeMoveOrtho :: Disc -> Location -> Board -> Board
+makeMoveOrtho disc loc = (makeMoveCol disc loc) . (makeMoveRow disc loc) 
+
+
 makeMoveCol :: Disc -> Location -> Board -> Board 
 makeMoveCol disc loc@(x, y) board = if isValidLoc loc board then answer else board
                                   where
