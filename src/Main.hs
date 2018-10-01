@@ -52,6 +52,9 @@ boardToCells board = map (lookup' board) genKeys
 lookup' :: Ord k => Map k a -> k -> Maybe a
 lookup' = flip Map.lookup
 
+placeDisc :: Location -> Disc -> Board -> Board 
+placeDisc = Map.insert
+
 -- Test boards for testing different game states
 startingBoard :: Board 
 startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4), White)]
@@ -286,7 +289,10 @@ getCell = Map.lookup
 
 -- Functions for making a move and changing the board state to a new one if the move is valid.
 makeMove :: Disc -> Location -> Board -> Board 
-makeMove disc loc = (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)
+makeMove disc loc board = if condition1 && condition2 then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
+                  where
+                    condition1 = isValidLoc loc board
+                    condition2 = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
 
 makeMoveDiago :: Disc -> Location -> Board -> Board
 makeMoveDiago disc loc = (makeMoveMinor disc loc) . (makeMoveMajor disc loc) 
