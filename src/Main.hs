@@ -284,10 +284,45 @@ isEmptyCell _       = False
 getCell :: Location -> Board -> Cell
 getCell = Map.lookup 
 
--- Functions for making a move and changing the board state to a new one if the move is valid. 
+-- Functions for making a move and changing the board state to a new one if the move is valid.
+makeMoveMinor :: Disc -> Location -> Board -> Board
+makeMoveMinor disc loc@(x, y) board = if isValidLoc loc board then answer else board
+                                    where 
+                                      preceding = reverse $ precedingCellsMinor loc board
+                                      following = followingCellsMinor loc board
+                                      precedingCaptured = getCaptured (Just disc) preceding
+                                      followingCaptured = getCaptured (Just disc) following 
+                                      precedingFlipped  = reverse $ flipCaptured precedingCaptured
+                                      followingFlipped  = flipCaptured followingCaptured
+                                      newCells1         = precedingFlipped ++ [Nothing] ++ followingFlipped 
+                                      newCellsMap2      = zip (getMinorKeys loc) newCells1
+                                      newCellsMap3      = filter (\x -> not((snd x) == Nothing)) newCellMap2
+                                      newMinorKeys      = map fst newCellMap3
+                                      newCells2         = map snd newCellMap3
+                                      newDiscs          = map fromJust newCells2
+                                      newMinor          = makeBoard (zip newMinorKeys newDiscs)
+                                      answer            = Map.union newMinor board 
+
+makeMoveMajor :: Disc -> Location -> Board -> Board
+makeMoveMajor disc loc@(x, y) board = if isValidLoc loc board then answer else board
+                                    where
+                                      preceding         = reverse $ precedingCellsMajor loc board
+                                      following         = followingCellsMajor loc board
+                                      precedingCaptured = getCaptured (Just disc) preceding
+                                      followingCaptured = getCaptured (Just disc) following
+                                      precedingFlipped  = reverse $ flipCaptured precedingCaptured
+                                      followingFlipped  = flipCaptured followingCaptured
+                                      newCells1         = precedingFlipped ++ [Nothing] ++ followingFlipped
+                                      newCellMap2       = zip (getMajorKeys loc) newCells1 
+                                      newCellMap3       = filter (\x -> not ((snd x) == Nothing)) newCellMap2
+                                      newMajorKeys      = map fst newCellMap3
+                                      newCells2         = map snd newCellMap3
+                                      newDiscs          = map fromJust newCells2 
+                                      newMajor          = makeBoard (zip newMajorKeys newDiscs)
+                                      answer            = Map.union newMajor board 
+
 makeMoveOrtho :: Disc -> Location -> Board -> Board
 makeMoveOrtho disc loc = (makeMoveCol disc loc) . (makeMoveRow disc loc) 
-
 
 makeMoveCol :: Disc -> Location -> Board -> Board 
 makeMoveCol disc loc@(x, y) board = if isValidLoc loc board then answer else board
@@ -326,6 +361,18 @@ makeMoveRow disc loc@(x, y) board = if isValidLoc loc board then answer else boa
                                     answer            = Map.union newRow board  -- insert newRow into board using union
                                       --insert :: Ord k => k -> a -> Map k a -> Map k a
                                       --union :: Ord k => Map k a -> Map k a -> Map k a
+getMinorKeys :: Location -> [Location] 
+getMinorKeys loc@(x, y) = zip [ a | a <- [startX..endX]] [ b | b <- [startY..endY]]
+                        where
+                          
+
+getMajorKeys :: Location -> [Location]
+getMajorKeys loc@(x, y) = zip [ a | a <- [startX..endX]] [ b | b <- [startY..endY]]
+                        where 
+                          startX = fst $ findStartMajor loc
+                          endX   = fst $ findEndMajor loc 
+                          startY = snd $ findStartMajor loc
+                          endY   = snd $ findEndMajor loc                                   
 
 getColKeys :: Location -> [Location]
 getColKeys (x, y) = [(x, b) | b <- [0..7]]                                      
