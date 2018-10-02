@@ -34,12 +34,17 @@ flipDisc White = Black
 
 genLoc :: State -> IO (Int, Int)
 genLoc state@(State disc board) = do
-  index <- randomRIO (0, ((length $ possibleMoves disc board) - 1))
-  return $ (possibleMoves disc board) !! index 
+                                   x <- randomRIO (0,7)
+                                   y <- randomRIO (0,7)
+                                   if elem (x, y) possible then
+                                    return (x,y)
+                                   else genLoc state
+                                where 
+                                  possible = possibleMoves disc board
 
 gameEnd :: State -> IO ()
-gameEnd (State disc board) = 
-  if (((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)) then
+gameEnd state@(State disc board) = 
+  if noMoves state then
     do putBoard board
        if (isWinner Black board) then
         putStrLn "Black won! White lost!"
@@ -47,6 +52,9 @@ gameEnd (State disc board) =
        putStrLn "Better luck next time!"
        exitSuccess
   else return () 
+
+noMoves :: State -> Bool
+noMoves state@(State disc board) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
 
 isWinner :: Disc -> Board -> Bool
 isWinner disc board = answer
