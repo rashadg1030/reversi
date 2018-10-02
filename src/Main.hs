@@ -49,7 +49,13 @@ gameEnd (State disc board) =
   else return () 
 
 isWinner :: Disc -> Board -> Bool
-isWinner disc board = undefined
+isWinner disc board = answer
+                    where
+                      step1 = Map.toList board 
+                      step2 = map snd step1
+                      step31 = filter (\d1 -> d1 == disc) step2
+                      step32 = filter (\d2 -> d2 == (flipDisc disc)) step2
+                      answer = (length step31) > (length step32) 
 
 -- Data
 data Disc = Black | White
