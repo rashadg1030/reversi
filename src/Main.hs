@@ -24,6 +24,8 @@ runGame state@(State disc board) = forever $ do
     putStrLn "Black's turn."
   else putStrLn "White's turn."
   loc <- genLoc state
+  putStr "Move: "
+  print loc
   (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
 
 flipDisc :: Disc -> Disc
@@ -38,10 +40,16 @@ genLoc state@(State disc board) = do
 gameEnd :: State -> IO ()
 gameEnd (State disc board) = 
   if (((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)) then
-    do putStrLn "Somebody lost!"
+    do putBoard board
+       if (isWinner Black board) then
+        putStrLn "Black won! White lost!"
+       else putStrLn "White won! Black lost!"
        putStrLn "Better luck next time!"
        exitSuccess
   else return () 
+
+isWinner :: Disc -> Board -> Bool
+isWinner disc board = undefined
 
 -- Data
 data Disc = Black | White
