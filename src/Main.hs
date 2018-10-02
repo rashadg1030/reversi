@@ -149,6 +149,9 @@ testBoard3 = makeBoard [((2,4), White)
                       , ((5,6), White)
                       , ((6,7), Black)] 
 
+testBoard4 :: Board 
+testBoard4 = makeBoard [((3,3), White), ((4,4), Black), ((5,5), Black), ((6,6), Black)]
+
 makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
 
