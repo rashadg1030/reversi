@@ -5,12 +5,45 @@ import qualified Data.Map.Strict as Map
 import Data.Map.Strict (Map)
 import Data.Maybe
 import Data.Functor
+import Control.Monad
+import System.Exit (exitSuccess)
+import System.Random (randomRIO)
+
+data State = State Disc Board  
 
 main :: IO ()
-main = undefined
+main = do
+  let startingState = (State Black startingBoard)
+  runGame startingState 
+
+runGame :: State -> IO ()
+runGame state@(State disc board) = forever $ do
+  gameEnd state
+  putBoard board
+  if (disc == Black) then
+    putStrLn "Black's turn."
+  else putStrLn "White's turn."
+  loc <- genLoc state
+  (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
+
+flipDisc :: Disc -> Disc
+flipDisc Black = White
+flipDisc White = Black
+
+genLoc :: State -> IO (Int, Int)
+genLoc state@(State disc board) = do
+  index <- randomRIO (0, ((length $ possibleMoves disc board) - 1))
+  return $ (possibleMoves disc board) !! index 
+
+gameEnd :: State -> IO ()
+gameEnd (State disc board) = 
+  if (((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)) then
+    do putStrLn "Somebody lost!"
+       putStrLn "Better luck next time!"
+       exitSuccess
+  else return () 
 
 -- Data
-
 data Disc = Black | White
     deriving (Show, Eq)
   
@@ -289,10 +322,9 @@ getCell = Map.lookup
 
 -- Functions for making a move and changing the board state to a new one if the move is valid.
 makeMove :: Disc -> Location -> Board -> Board 
-makeMove disc loc board = if condition1 && condition2 then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
+makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
                   where
-                    condition1 = isValidLoc loc board
-                    condition2 = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
+                    condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
 
 makeMoveDiago :: Disc -> Location -> Board -> Board
 makeMoveDiago disc loc = (makeMoveMinor disc loc) . (makeMoveMajor disc loc) 
@@ -399,12 +431,12 @@ flipCaptured :: ([Cell], [Cell]) -> [Cell]
 flipCaptured ([], [])                       = []
 flipCaptured ([], tail)                     = tail
 flipCaptured (captured, [])                 = captured
-flipCaptured (captured@(c:cs), tail@(t:ts)) = if isOppositeCell c t then (map flipDisc captured) ++ tail else captured ++ tail
+flipCaptured (captured@(c:cs), tail@(t:ts)) = if isOppositeCell c t then (map flipCell captured) ++ tail else captured ++ tail
 
-flipDisc :: Cell -> Cell
-flipDisc Nothing      = Nothing
-flipDisc (Just Black) = Just White
-flipDisc (Just White) = Just Black
+flipCell :: Cell -> Cell
+flipCell Nothing      = Nothing
+flipCell (Just Black) = Just White
+flipCell (Just White) = Just Black
 
 getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
 getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
