@@ -302,6 +302,7 @@ precedingKeysMajor loc@(x, y) = answer
                             listY  = [startY..(y-1)]
                             answer = zip listX listY 
 
+-- BUG FOUND
 findStartMajor :: Location -> Location
 findStartMajor loc@(x, y) = if isEdge loc then loc else findStartMajor (x-1, y-1)
 
