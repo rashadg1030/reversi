@@ -259,7 +259,7 @@ followingKeysMajor loc@(x, y) = answer
                                 answer = zip listX listY
 
 findEndMajor :: Location -> Location 
-findEndMajor loc@(x, y) = if isEdge loc then loc else findEndMajor (x+1, y+1)
+findEndMajor loc@(x, y) = if or [x == 7, y == 7] then loc else findEndMajor (x+1, y+1)
 
 followingCellsCol :: Location -> Board -> [Cell]
 followingCellsCol location board = map (lookup' board) (followingKeysCol location)
