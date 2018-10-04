@@ -304,7 +304,11 @@ precedingKeysMajor loc@(x, y) = answer
 
 -- BUG FOUND
 findStartMajor :: Location -> Location
-findStartMajor loc@(x, y) = if isEdge loc then loc else findStartMajor (x-1, y-1)
+findStartMajor loc@(x, y) = if or [x == 0, y == 0] then loc else findStartMajor $ backMajor loc
+
+-- "Go Back" along the major axis
+backMajor :: Location -> Location
+backMajor (x, y) = (x - 1, y - 1)
 
 sameLoc :: Location -> Location -> Bool
 sameLoc loc1 loc2 = loc1 == loc2
