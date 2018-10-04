@@ -243,7 +243,7 @@ followingKeysMinor loc@(x, y) = answer
                                 answer = zip listX listY      
 
 findEndMinor :: Location -> Location
-findEndMinor loc@(x, y) = if isEdge loc then loc else findEndMinor (x+1, y-1)
+findEndMinor loc@(x, y) = if or [x == 7, y == 0] then loc else findEndMinor (x+1, y-1)
 
 followingCellsMajor :: Location -> Board -> [Cell]
 followingCellsMajor location board = map (lookup' board) (followingKeysMajor location)
@@ -287,7 +287,7 @@ precedingKeysMinor loc@(x, y) = answer
                                 answer = zip listX listY
 
 findStartMinor :: Location -> Location
-findStartMinor loc@(x, y) = if isEdge loc then loc else findStartMinor (x-1, y+1) 
+findStartMinor loc@(x, y) = if or [x == 0, y == 7] then loc else findStartMinor (x-1, y+1) 
 
 precedingCellsMajor :: Location -> Board -> [Cell]
 precedingCellsMajor location board = map (lookup' board) (precedingKeysMajor location)
