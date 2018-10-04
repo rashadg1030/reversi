@@ -304,7 +304,10 @@ precedingKeysMajor loc@(x, y) = answer
 
 -- BUG FOUND
 findStartMajor :: Location -> Location
-findStartMajor loc@(x, y) = if (isEdge loc && (not(loc == findEndMajor loc))) then loc else findStartMajor (x-1, y-1)
+findStartMajor loc@(x, y) = if isEdge loc then 
+                              loc
+                               
+                            else findStartMajor (x-1, y-1)
 
 isEdge :: Location -> Bool
 isEdge (x, y) = or [(x == 0 || y == 0), (x == 7 || y == 7)] 
