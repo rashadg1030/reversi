@@ -22,7 +22,7 @@ runGame state@(State disc board) = forever $ do
   putBoard board   
   if (possibleMoves disc board == []) then
     do
-      putStr "#PASS#"
+      putStr "#PASS#\n"
       (return (State (flipDisc disc) board)) >>= runGame
   else
     do
