@@ -19,14 +19,18 @@ main = do
 runGame :: State -> IO ()
 runGame state@(State disc board) = forever $ do
   gameEnd state
-  putBoard board
-  if (disc == Black) then
-    putStrLn "Black's turn."
-  else putStrLn "White's turn."
-  loc <- genLoc state
-  putStr "Move: "
-  print loc
-  (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
+  putBoard board   
+  if (possibleMoves disc board == []) then
+    do
+      putStr "#PASS#"
+      (return (State (flipDisc disc) board)) >>= runGame
+  else
+    do
+      print disc
+      loc <- genLoc state
+      putStr "Move: "
+      print loc
+      (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
 
 flipDisc :: Disc -> Disc
 flipDisc Black = White
