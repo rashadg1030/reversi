@@ -79,7 +79,6 @@ type Location = (Int, Int)
 
 type Board = Map Location Disc
 
--- For displaying boards
 putBoard :: Board -> IO ()
 putBoard board = putStr step4
                    where 
@@ -93,7 +92,11 @@ capBoard x = "---------------------------------\n" ++ x
 
 cellMapToString :: [(Location, Cell)] -> String
 cellMapToString [] = ""
-cellMapToString (((x, y), c):tail) = (if x == 7 then (cellToString c) ++ "|\n---------------------------------\n" else cellToString c) ++ cellMapToString tail
+cellMapToString (((x, y), c):tail) = (if x == 7 then 
+                                        (cellToString c) ++ line 
+                                      else cellToString c) ++ cellMapToString tail
+                                   where 
+                                    line = "|\n---------------------------------\n"
 
 cellToString :: Cell -> String
 cellToString (Nothing)    = "|   " 
