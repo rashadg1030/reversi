@@ -79,8 +79,6 @@ type Location = (Int, Int)
 
 type Board = Map Location Disc
 
--- Functions
-
 -- For displaying boards
 putBoard :: Board -> IO ()
 putBoard board = putStr step4
