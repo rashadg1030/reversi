@@ -2,8 +2,9 @@ module Actions where
 
 import qualified Data.Map.Strict as Map
 import Data.Maybe
-import Types
+
 import Board
+import Types
 
 flipDisc :: Disc -> Disc
 flipDisc Black = White

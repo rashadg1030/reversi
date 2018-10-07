@@ -1,16 +1,13 @@
 module Main where
 
-import Data.List
 import qualified Data.Map.Strict as Map
-import Data.Map.Strict (Map)
-import Data.Maybe
-import Data.Functor
 import Control.Monad
 import System.Exit (exitSuccess)
 import System.Random (randomRIO)
-import Types
+
+import Actions
 import Board
-import Actions 
+import Types 
 
 main :: IO ()
 main = do
@@ -65,4 +62,3 @@ isWinner disc board = answer
                       step31 = filter (\d1 -> d1 == disc) step2
                       step32 = filter (\d2 -> d2 == (flipDisc disc)) step2
                       answer = (length step31) > (length step32) 
-
