@@ -1,5 +1,7 @@
 module Types where
 
+import Data.Map.Strict (Map)
+
 data State = State Disc Board
 
 data Disc = Black | White
