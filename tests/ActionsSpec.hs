@@ -1,11 +1,13 @@
-module ActionsSpec where
+module ActionsSpec (spec) where
 
 import Test.Hspec
 
 import Actions
+import Board
+import Types
 
-main :: IO ()
-main = hspec $ do
+spec :: Spec
+spec = hspec $ do
     describe "flipCell" $ do
         it "returns (Just White) if (Just Black) is passed in." $
             flipCell (Just Black) `shouldBe` (Just White)
