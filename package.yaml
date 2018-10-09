@@ -1,0 +1,44 @@
+name: Reversi
+version: 0.31.0
+synopsis: The game of Reversi written in Haskell.
+description: A fun, simple board game to play with family and friends.
+maintainer: Rashad Gover <rashad.sasaki@gmail.com>
+github: https://github.com/rashadg1030
+category: Development
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.9 && < 5
+  - Data.Map.Strict
+
+library:
+  source-dirs: src
+  exposed-modules:
+    - Hpack
+    - Hpack.Config
+    - Hpack.Render
+    - Hpack.Yaml
+
+executable:
+  main: Main.hs
+  source-dirs: driver
+  dependencies:
+    - hpack
+
+tests:
+  spec:
+    cpp-options: -DTEST
+    main: Spec.hs
+    source-dirs:
+      - test
+      - src
+    dependencies:
+      - hspec == 2.*
+      - QuickCheck
+      - temporary
+      - mockery >= 0.3
+      - interpolate
+      - template-haskell
+      - HUnit >= 1.6.0.0
+    build-tools: hspec-discover
