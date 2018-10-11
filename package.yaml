@@ -32,6 +32,7 @@ tests:
       - Actions
       - Board
       - Types
+      - ActionsSpec
     dependencies:
       - hspec == 2.*
     build-tools: hspec-discover

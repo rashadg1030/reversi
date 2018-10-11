@@ -7,7 +7,7 @@ import Board
 import Types
 
 spec :: Spec
-spec = hspec $ do
+spec = do
     describe "flipCell" $ do
         it "returns (Just White) if (Just Black) is passed in." $
             flipCell (Just Black) `shouldBe` (Just White)
