@@ -26,10 +26,10 @@ spec = do
             flipDisc White `shouldBe` Black
 
     describe "isInside" $ do
-        it "returns False if the location is not on the board." $
+        it "returns False if Location is not on the board." $
             isInside (9,0) `shouldBe` False
 
-        it "returns True if the location is on the board." $
+        it "returns True if Location is on the board." $
             isInside (3,5) `shouldBe` True
 
     describe "isEmptyCell" $ do 
@@ -39,8 +39,22 @@ spec = do
         it "returns False if (Just _) is passed in." $
             isEmptyCell (Just White)  `shouldBe` False
             
-            
+    describe "getMajorKeys" $ do
+        it "returns [Location] if Location is passed in." $
+            getMajorKeys (3,3) `shouldBe` [(0,0), (1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7)]
+
+        it "returns [Location] if Location is passed in." $
+            getMajorKeys (1,6) `shouldBe` [(0,5), (1,6), (2,7)]
+
+        it "returns [Location] if Location is passed in." $
+            getMajorKeys (7,0) `shouldBe` [(7,0)]
     
+        it "returns [Location] if Location is passed in." $
+            getMajorKeys (0,7) `shouldBe` [(0,7)]
+
+    describe "flipCaptured" $ do
+        it "returns [Cell] if ([Cell], [Cell]) is passed in." $ do
+            pending 
 
 
     
