@@ -17,4 +17,11 @@ spec = do
 
         it "returns Nothing if Nothing is passed in." $
             flipCell Nothing `shouldBe` Nothing
+        
+    describe "flipDisc" $ do
+        it "returns Black if White is passed in." $ 
+            flipDisc Black `shouldBe` White
+
+        it "returns White if Black is passed in." $
+            flipDisc White `shouldBe` Black
 
