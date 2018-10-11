@@ -25,3 +25,4 @@ spec = do
         it "returns White if Black is passed in." $
             flipDisc White `shouldBe` Black
 
+    
