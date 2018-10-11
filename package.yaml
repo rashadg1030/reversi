@@ -10,7 +10,7 @@ ghc-options: -Wall
 
 dependencies:
   - base >= 4.9 && < 5
-  - Data.Map.Strict
+  - map
 
 library:
   source-dirs: src
@@ -22,23 +22,18 @@ library:
 
 executable:
   main: Main.hs
-  source-dirs: driver
+  source-dirs: src
   dependencies:
-    - hpack
+    - Actions
+    - Board
+    - Types
 
 tests:
   spec:
     cpp-options: -DTEST
     main: Spec.hs
     source-dirs:
-      - test
-      - src
+      - tests
     dependencies:
       - hspec == 2.*
-      - QuickCheck
-      - temporary
-      - mockery >= 0.3
-      - interpolate
-      - template-haskell
-      - HUnit >= 1.6.0.0
     build-tools: hspec-discover
