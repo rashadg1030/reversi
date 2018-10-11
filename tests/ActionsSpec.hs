@@ -25,4 +25,22 @@ spec = do
         it "returns White if Black is passed in." $
             flipDisc White `shouldBe` Black
 
+    describe "isInside" $ do
+        it "returns False if the location is not on the board." $
+            isInside (9,0) `shouldBe` False
+
+        it "returns True if the location is on the board." $
+            isInside (3,5) `shouldBe` True
+
+    describe "isEmptyCell" $ do 
+        it "returns True if Nothing is passed in." $
+            isEmptyCell Nothing `shouldBe` True
+
+        it "returns False if (Just _) is passed in." $
+            isEmptyCell (Just White)  `shouldBe` False
+            
+            
+    
+
+
     
