@@ -10,20 +10,13 @@ ghc-options: -Wall
 
 dependencies:
   - base >= 4.9 && < 5
-  - map
-
-library:
-  source-dirs: src
-  exposed-modules:
-    - Hpack
-    - Hpack.Config
-    - Hpack.Render
-    - Hpack.Yaml
+  - containers
+  - random
 
 executable:
   main: Main.hs
   source-dirs: src
-  dependencies:
+  other-modules:
     - Actions
     - Board
     - Types
@@ -34,6 +27,11 @@ tests:
     main: Spec.hs
     source-dirs:
       - tests
+      - src
+    other-modules:
+      - Actions
+      - Board
+      - Types
     dependencies:
       - hspec == 2.*
     build-tools: hspec-discover
