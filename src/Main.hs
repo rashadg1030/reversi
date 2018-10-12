@@ -9,26 +9,34 @@ import Actions
 import Board
 import Types 
 
+
 main :: IO ()
-main = do
-  let startingState = (State Black startingBoard)
-  runGame startingState 
+main = undefined
 
 runGame :: State -> IO ()
-runGame state@(State disc board) = forever $ do
+runGame state@(State disc board) = undefined
+
+
+randomGame :: IO ()
+randomGame = do
+  let startingState = (State Black startingBoard)
+  genRandomGame startingState 
+
+genRandomGame :: State -> IO ()
+genRandomGame state@(State disc board) = forever $ do
   gameEnd state
   putBoard board   
   if (possibleMoves disc board == []) then
     do
       putStr "#PASS#\n"
-      (return (State (flipDisc disc) board)) >>= runGame
+      (return (State (flipDisc disc) board)) >>= genRandomGame
   else
     do
       print disc
       loc <- genLoc state
       putStr "Move: "
       print loc
-      (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
+      (return (State (flipDisc disc) (makeMove disc loc board))) >>= genRandomGame
 
 genLoc :: State -> IO (Int, Int)
 genLoc state@(State disc board) = do
