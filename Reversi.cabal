@@ -1,7 +1,5 @@
 -- This file has been generated from package.yaml by hpack version 0.28.2.
---
 -- see: https://github.com/sol/hpack
---
 -- hash: 367c688912bc6bc5e7ac7979619162535457e2b10d1ba7b22576240fd12d3f04
 
 name:           Reversi
