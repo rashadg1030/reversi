@@ -4,18 +4,56 @@ import qualified Data.Map.Strict as Map
 import Control.Monad
 import System.Exit (exitSuccess)
 import System.Random (randomRIO)
+import Data.Maybe
+import Text.Read
 
 import Actions
 import Board
 import Types 
 
-
 main :: IO ()
-main = undefined
+main =  do 
+  let startingState = (State Black startingBoard)
+  runGame startingState
 
 runGame :: State -> IO ()
-runGame state@(State disc board) = undefined
+runGame state@(State disc board) = forever $ do
+  gameEnd state
+  putBoard board
+  if (possibleMoves disc board == []) then
+    do
+      putStrLn "#PASS#"
+      (return (State (flipDisc disc) board)) >>= runGame
+  else 
+    do
+      if disc == Black then
+        putStrLn "Black's move. Enter location in the format (x,y), or enter PASS to skip."
+      else
+        putStrLn "White's move. Enter location in the format (x,y), or enter PASS to skip."
 
+      input <- getLine
+      if input == "PASS" then
+        do 
+          putStrLn "#PASS#"
+          (return (State (flipDisc disc) board)) >>= runGame
+      else
+        do
+          let loc = readMaybe input :: Maybe Location 
+          if (not ((==) loc Nothing)) then 
+            do
+              if (elem (fromJust loc) (possibleMoves disc board)) then
+                do   
+                  putStrLn "Good location."
+                  (return (State (flipDisc disc) (makeMove disc (fromJust loc) board))) >>= runGame
+              else
+                do 
+                  putStrLn "Can't make that move. Try Again."
+                  (return state) >>= runGame
+          else
+            do 
+              {-Don't do anything an return board back to user so they can try again.-}
+              putStrLn "Invalid input. Try again."
+              (return state) >>= runGame 
 
 randomGame :: IO ()
 randomGame = do
@@ -28,7 +66,7 @@ genRandomGame state@(State disc board) = forever $ do
   putBoard board   
   if (possibleMoves disc board == []) then
     do
-      putStr "#PASS#\n"
+      putStrLn "#PASS#"
       (return (State (flipDisc disc) board)) >>= genRandomGame
   else
     do
