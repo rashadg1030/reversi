@@ -4,7 +4,7 @@ synopsis: The game of Reversi written in Haskell.
 description: A fun, simple board game to play with family and friends.
 maintainer: Rashad Gover <rashad.sasaki@gmail.com>
 github: https://github.com/rashadg1030
-category: Development
+category: Experimental
 
 ghc-options: -Wall
 
