@@ -27,33 +27,28 @@ runGame state@(State disc board) = forever $ do
   else 
     do
       if disc == Black then
-        putStrLn "Black's move. Enter location in the format (x,y), or enter PASS to skip."
+        putStrLn "Black's move. Enter location in the format (x,y)."
       else
-        putStrLn "White's move. Enter location in the format (x,y), or enter PASS to skip."
+        putStrLn "White's move. Enter location in the format (x,y)."
 
       input <- getLine
-      if input == "PASS" then
-        do 
-          putStrLn "#PASS#"
-          (return (State (flipDisc disc) board)) >>= runGame
-      else
+      let loc = readMaybe input :: Maybe Location
+
+      if (not ((==) loc Nothing)) then 
         do
-          let loc = readMaybe input :: Maybe Location 
-          if (not ((==) loc Nothing)) then 
-            do
-              if (elem (fromJust loc) (possibleMoves disc board)) then
-                do   
-                  putStrLn "Good location."
-                  (return (State (flipDisc disc) (makeMove disc (fromJust loc) board))) >>= runGame
-              else
-                do 
-                  putStrLn "Can't make that move. Try Again."
-                  (return state) >>= runGame
+          if (elem (fromJust loc) (possibleMoves disc board)) then
+            do   
+              putStrLn "Good location."
+              (return (State (flipDisc disc) (makeMove disc (fromJust loc) board))) >>= runGame
           else
             do 
-              {-Don't do anything an return board back to user so they can try again.-}
-              putStrLn "Invalid input. Try again."
-              (return state) >>= runGame 
+              putStrLn "Can't make that move. Try Again."
+              (return state) >>= runGame
+      else
+        do 
+          {-Don't do anything anD return board back to user so they can try again.-}
+          putStrLn "Invalid input. Try again."
+          (return state) >>= runGame 
 
 randomGame :: IO ()
 randomGame = do

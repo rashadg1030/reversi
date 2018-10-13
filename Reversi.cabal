@@ -1,12 +1,14 @@
 -- This file has been generated from package.yaml by hpack version 0.28.2.
+--
 -- see: https://github.com/sol/hpack
--- hash: 367c688912bc6bc5e7ac7979619162535457e2b10d1ba7b22576240fd12d3f04
+--
+-- hash: 30fa303f610ae53b39ef834ce97a67a58024cd03eb12aa85b5a3e7506493174c
 
 name:           Reversi
 version:        0.31.0
 synopsis:       The game of Reversi written in Haskell.
 description:    A fun, simple board game to play with family and friends.
-category:       Development
+category:       Experimental
 homepage:       https://github.com/https://github.com/rashadg1030#readme
 bug-reports:    https://github.com/https://github.com/rashadg1030/issues
 maintainer:     Rashad Gover <rashad.sasaki@gmail.com>
