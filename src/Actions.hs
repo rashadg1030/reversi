@@ -2,7 +2,7 @@ module Actions where
 
 import qualified Data.Map.Strict as Map
 import Data.Maybe
--- Test commit
+
 import Board
 import Types
 
