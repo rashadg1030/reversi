@@ -54,7 +54,5 @@ spec = do
 
     describe "flipCaptured" $ do
         it "returns [Cell] if ([Cell], [Cell]) is passed in." $ do
-            pending 
-
-
+            flipCaptured ([],[]) `shouldBe` []
     

@@ -27,9 +27,9 @@ runGame state@(State disc board) = forever $ do
   else 
     do
       if disc == Black then
-        putStrLn "Black's move. Enter location in the format (x,y)."
+        putStrLn "Black's move. Enter location in the format (x,y). Ctrl + C to quit."
       else
-        putStrLn "White's move. Enter location in the format (x,y)."
+        putStrLn "White's move. Enter location in the format (x,y). Ctrl + C to quit."
 
       input <- getLine
       let loc = readMaybe input :: Maybe Location
