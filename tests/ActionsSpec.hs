@@ -53,6 +53,9 @@ spec = do
             getMajorKeys (0,7) `shouldBe` [(0,7)]
 
     describe "flipCaptured" $ do
-        it "returns [Cell] if ([Cell], [Cell]) is passed in." $ do
+        it "returns [] if ([], []) is passed in." $ do
             flipCaptured ([],[]) `shouldBe` []
+
+        it "returns [Cell] if ([], [Cell])" $ do
+            flipCaptured ([], [Just Black, Just White]) `shouldBe` [Just Black, Just White]
     
