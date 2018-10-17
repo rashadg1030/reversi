@@ -62,4 +62,6 @@ spec = do
     describe "getRowKeys" $ do
         it "returns [Location] if Location is passed in." $ do 
             getRowKeys (3,4) `shouldBe` [(0,4), (1,4), (2,4), (3,4), (4,4), (5,4), (6,4), (7,4)]
+
+            getRowKeys (0,0) `shouldBe` [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (7,0)]
     
