@@ -16,9 +16,9 @@ placeDisc = Map.insert
 -- Functions for creating a list of all possible moves for a given color of Disc
 possibleMoves :: Disc -> Board -> [Location]
 possibleMoves disc board = answer 
-                        where
-                        sieve = (flip (checkMove disc)) board
-                        answer = filter sieve genKeys
+                         where
+                            sieve = (flip (checkMove disc)) board
+                            answer = filter sieve genKeys
 
 checkMove :: Disc -> Location -> Board -> Bool
 checkMove disc loc board = or [(checkMoveOrtho disc loc board), (checkMoveDiago disc loc board)]
@@ -200,7 +200,7 @@ getCell = Map.lookup
 makeMove :: Disc -> Location -> Board -> Board 
 makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
                 where
-                condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
+                    condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
 
 makeMoveDiago :: Disc -> Location -> Board -> Board
 makeMoveDiago disc loc = (makeMoveMinor disc loc) . (makeMoveMajor disc loc) 

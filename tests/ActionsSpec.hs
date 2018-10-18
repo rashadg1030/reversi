@@ -64,4 +64,10 @@ spec = do
             getRowKeys (3,4) `shouldBe` [(0,4), (1,4), (2,4), (3,4), (4,4), (5,4), (6,4), (7,4)]
 
             getRowKeys (0,0) `shouldBe` [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (7,0)]
-    
+
+    describe "makeMove" $ do 
+        it "returns Board if Disc, Location, and Board is passed in." $ do
+            makeMove Black (3,2) startingBoard `shouldBe` makeBoard [((3,2), Black), ((3,3), Black), ((4,3), Black), ((3,4), Black), ((4,4), White)] 
+
+        it "returns Board if Disc, Location, and Board is passed in." $ do
+            makeMove White (6,5) testBoard2 `shouldBe` makeBoard [((3,3), White), ((4,3), White), ((3,4), Black), ((4,4), Black), ((5,4), White), ((4,5), White), ((4,6), White), ((6,5), White)]
