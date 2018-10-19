@@ -71,3 +71,33 @@ spec = do
 
         it "returns Board if Disc, Location, and Board is passed in." $ do
             makeMove White (6,5) testBoard2 `shouldBe` makeBoard [((3,3), White), ((4,3), White), ((3,4), Black), ((4,4), Black), ((5,4), White), ((4,5), White), ((4,6), White), ((6,5), White)]
+
+        it "returns Board if Disc, Location, and Board is passed in." $ do
+            makeMove Black (3,4) testBoard3 `shouldBe` makeBoard [((3,4), Black)
+                                                                , ((2,4), Black)
+                                                                , ((1,4), Black)
+                                                                , ((0,4), Black)
+                                                                , ((4,4), Black)
+                                                                , ((5,4), Black)
+                                                                , ((6,4), Black)
+                                                                , ((7,4), Black)
+                                                                , ((3,3), Black)
+                                                                , ((3,2), Black)
+                                                                , ((3,1), Black)
+                                                                , ((3,0), Black)
+                                                                , ((3,5), Black)
+                                                                , ((3,6), Black)
+                                                                , ((3,7), Black)
+                                                                , ((4,3), Black)
+                                                                , ((5,2), Black)
+                                                                , ((6,1), Black)
+                                                                , ((7,0), Black)
+                                                                , ((2,5), Black)
+                                                                , ((1,6), Black)
+                                                                , ((0,7), Black)
+                                                                , ((2,3), Black)
+                                                                , ((1,2), Black)
+                                                                , ((0,1), Black)
+                                                                , ((4,5), Black)
+                                                                , ((5,6), Black)
+                                                                , ((6,7), Black)] 
