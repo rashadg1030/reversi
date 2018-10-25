@@ -20,29 +20,29 @@ runGame :: State -> IO ()
 runGame state@(State disc board) = forever $ do
   gameEnd state
   putBoard board
-  if (possibleMoves disc board == []) then
-    do
-      putStrLn "#PASS#"
-      (return (State (flipDisc disc) board)) >>= runGame
-  else 
-    do
-      putStrLn $ moveMessage disc
-      input <- getLine
-      
-      case readMaybe input of
-        Nothing -> do
-                    putStrLn "Invalid input. Try Again."
-                    (return state) >>= runGame
-        (Just loc) -> do
-                      if (elem loc (possibleMoves disc board)) then
-                        do   
-                         putStrLn "Good location."
-                         (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
-                      else
-                        do 
-                         putStrLn "Can't make that move. Try Again."
-                         (return state) >>= runGame
 
+  case possibleMoves disc board of
+    [] -> do
+           putStrLn "#PASS#"
+           (return (State (flipDisc disc) board)) >>= runGame
+    _  -> do
+           putStrLn $ moveMessage disc
+           input <- getLine
+            
+           case readMaybe input of
+            Nothing -> do
+                        putStrLn "Invalid input. Try Again."
+                        (return state) >>= runGame
+            (Just loc) -> do
+                           if (elem loc (possibleMoves disc board)) then
+                            do   
+                             putStrLn "Good location."
+                             (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
+                           else
+                            do 
+                             putStrLn "Can't make that move. Try Again."
+                             (return state) >>= runGame
+      
 moveMessage :: Disc -> String
 moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
 
