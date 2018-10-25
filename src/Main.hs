@@ -51,7 +51,7 @@ moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (
 
 discName :: Disc -> String
 discName White = "White"
-discName _     = "Black"
+discName Black     = "Black"
 
 randomGame :: IO ()
 randomGame = do
