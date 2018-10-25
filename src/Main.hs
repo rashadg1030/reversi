@@ -26,11 +26,7 @@ runGame state@(State disc board) = forever $ do
       (return (State (flipDisc disc) board)) >>= runGame
   else 
     do
-      if disc == Black then
-        putStrLn "Black's move. Enter location in the format (x,y). Ctrl + C to quit."
-      else
-        putStrLn "White's move. Enter location in the format (x,y). Ctrl + C to quit."
-
+      putStrLn $ moveMessage disc
       input <- getLine
       let loc = readMaybe input :: Maybe Location
 
@@ -49,6 +45,13 @@ runGame state@(State disc board) = forever $ do
           {-Don't do anything anD return board back to user so they can try again.-}
           putStrLn "Invalid input. Try again."
           (return state) >>= runGame 
+
+moveMessage :: Disc -> String
+moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+
+discName :: Disc -> String
+discName White = "White"
+discName _     = "Black"
 
 randomGame :: IO ()
 randomGame = do
