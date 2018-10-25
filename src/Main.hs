@@ -28,6 +28,22 @@ runGame state@(State disc board) = forever $ do
     do
       putStrLn $ moveMessage disc
       input <- getLine
+      
+      case readMaybe input of
+        Nothing -> do
+                    putStrLn "Invalid input. Try Again."
+                    (return state) >>= runGame
+        (Just loc) -> do
+                      if (elem loc (possibleMoves disc board)) then
+                        do   
+                         putStrLn "Good location."
+                         (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
+                      else
+                        do 
+                         putStrLn "Can't make that move. Try Again."
+                         (return state) >>= runGame
+      
+      {-
       let loc = readMaybe input :: Maybe Location
 
       if (not ((==) loc Nothing)) then 
@@ -45,13 +61,14 @@ runGame state@(State disc board) = forever $ do
           {-Don't do anything anD return board back to user so they can try again.-}
           putStrLn "Invalid input. Try again."
           (return state) >>= runGame 
+      -}  
 
 moveMessage :: Disc -> String
 moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
 
 discName :: Disc -> String
 discName White = "White"
-discName Black     = "Black"
+discName Black = "Black"
 
 randomGame :: IO ()
 randomGame = do
