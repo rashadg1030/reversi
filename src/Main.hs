@@ -1,5 +1,5 @@
 module Main where
-
+  
 import qualified Data.Map.Strict as Map
 import Control.Monad
 import System.Exit (exitSuccess)
@@ -36,7 +36,7 @@ runGame state@(State disc board) = forever $ do
             (Just loc) -> do
                            if (elem loc (possibleMoves disc board)) then
                             do   
-                             putStrLn "Good location."
+                             putStrLn "Valid location."
                              (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
                            else
                             do 
