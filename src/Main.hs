@@ -16,7 +16,7 @@ main = do
   runGame startingState
 
 runGame :: State -> IO ()
-runGame state@(State disc board) = forever $ do
+runGame state@(State disc board) = do
   gameEnd state
   putBoard board
 
@@ -54,7 +54,7 @@ randomGame = do
   genRandomGame (State Black startingBoard) 
 
 genRandomGame :: State -> IO ()
-genRandomGame state@(State disc board) = forever $ do
+genRandomGame state@(State disc board) = do
   gameEnd state
   putBoard board   
   if (possibleMoves disc board == []) then
@@ -100,8 +100,8 @@ noMoves state@(State disc board) = ((length $ possibleMoves disc board) == 0) &&
 isWinner :: Disc -> Board -> Bool
 isWinner disc board = answer
   where
-    step1 = Map.toList board 
-    step2 = map snd step1
+    step1  = Map.toList board 
+    step2  = map snd step1
     step31 = filter (\d1 -> d1 == disc) step2
     step32 = filter (\d2 -> d2 == (flipDisc disc)) step2
     answer = (length step31) > (length step32) 
