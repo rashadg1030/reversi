@@ -6,7 +6,6 @@ import System.Exit (exitSuccess)
 import System.Random (randomRIO)
 import Data.Maybe
 import Text.Read
-
 import Actions
 import Board
 import Types 
@@ -24,7 +23,7 @@ runGame state@(State disc board) = forever $ do
   case possibleMoves disc board of
     [] -> do
             putStrLn "#PASS#"
-            (return (State (flipDisc disc) board)) >>= runGame
+            runGame (State (flipDisc disc) board)
     _  -> do
             putStrLn $ moveMessage disc
             input <- getLine
@@ -32,16 +31,16 @@ runGame state@(State disc board) = forever $ do
             case readMaybe input of
               Nothing    -> do
                               putStrLn "Invalid input. Try Again."
-                              (return state) >>= runGame
+                              runGame state
               (Just loc) -> do
                               if (elem loc (possibleMoves disc board)) then
                                 do   
                                   putStrLn "Valid location."
-                                  (return (State (flipDisc disc) (makeMove disc loc board))) >>= runGame
+                                  runGame (State (flipDisc disc) (makeMove disc loc board))
                               else
                                 do 
                                   putStrLn "Can't make that move. Try Again."
-                                  (return state) >>= runGame  
+                                  runGame state  
       
 moveMessage :: Disc -> String
 moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
@@ -61,14 +60,16 @@ genRandomGame state@(State disc board) = forever $ do
   if (possibleMoves disc board == []) then
     do
       putStrLn "#PASS#"
-      (return (State (flipDisc disc) board)) >>= genRandomGame
+      let newState = (State (flipDisc disc) board)
+      genRandomGame newState 
   else
     do
       print disc
       loc <- genLoc state
       putStr "Move: "
       print loc
-      (return (State (flipDisc disc) (makeMove disc loc board))) >>= genRandomGame
+      let newState = (State (flipDisc disc) (makeMove disc loc board))
+      genRandomGame newState 
 
 genLoc :: State -> IO (Int, Int)
 genLoc state@(State disc board) = do
@@ -76,7 +77,8 @@ genLoc state@(State disc board) = do
                                     y <- randomRIO (0,7)
                                     if elem (x, y) possible then
                                       return (x,y)
-                                    else genLoc state
+                                    else 
+                                      genLoc state
                                     where 
                                       possible = possibleMoves disc board
 
