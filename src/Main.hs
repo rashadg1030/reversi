@@ -87,9 +87,9 @@ gameEnd state@(State disc board) =
       putBoard board
       if (isWinner Black board) then
         putStrLn "Black won! White lost!"
-      else putStrLn "White won! Black lost!"
-        putStrLn "Better luck next time!"
-        exitSuccess
+      else 
+        putStrLn "White won! Black lost!"
+      exitSuccess
   else return () 
 
 noMoves :: State -> Bool
@@ -97,9 +97,9 @@ noMoves state@(State disc board) = ((length $ possibleMoves disc board) == 0) &&
 
 isWinner :: Disc -> Board -> Bool
 isWinner disc board = answer
-where
-  step1 = Map.toList board 
-  step2 = map snd step1
-  step31 = filter (\d1 -> d1 == disc) step2
-  step32 = filter (\d2 -> d2 == (flipDisc disc)) step2
-  answer = (length step31) > (length step32) 
+  where
+    step1 = Map.toList board 
+    step2 = map snd step1
+    step31 = filter (\d1 -> d1 == disc) step2
+    step32 = filter (\d2 -> d2 == (flipDisc disc)) step2
+    answer = (length step31) > (length step32) 
