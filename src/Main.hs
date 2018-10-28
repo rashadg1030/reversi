@@ -21,8 +21,8 @@ runGame state@(State disc board) = do
   putBoard board
 
   case possibleMoves disc board of
-    [] ->     do
-                putStrLn "#PASS#"
+    []     -> do
+                putStrLn $ passMessage disc
                 runGame (State (flipDisc disc) board)
     (x:xs) -> do
                 putStrLn $ moveMessage disc
@@ -41,7 +41,10 @@ runGame state@(State disc board) = do
                                   else
                                     do 
                                       putStrLn "Can't make that move. Try Again."
-                                      runGame state  
+                                      runGame state 
+                                      
+passMessage :: Disc -> String
+passMessage disc = (discName disc) ++ "passes..."  
       
 moveMessage :: Disc -> String
 moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
@@ -78,8 +81,6 @@ genLoc state@(State disc board) = do
                                     let possible = possibleMoves disc board
                                     if elem (x, y) possible then return (x,y) else genLoc state
                                      
-                                    
-
 gameEnd :: State -> IO ()
 gameEnd state@(State disc board) = 
   if noMoves state then
