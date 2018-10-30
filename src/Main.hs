@@ -44,7 +44,7 @@ runGame state@(State disc board) = do
                                       runGame state 
                                       
 passMessage :: Disc -> String
-passMessage disc = (discName disc) ++ "passes..."  
+passMessage disc = (discName disc) ++ " passes..."  
       
 moveMessage :: Disc -> String
 moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
