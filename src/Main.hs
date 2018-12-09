@@ -1,7 +1,10 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Main where
   
 import qualified Data.Map.Strict as Map
 import Control.Monad
+import Control.Monad.IO.Class
 import System.Exit (exitSuccess)
 import System.Random (randomRIO)
 import Data.Maybe
@@ -9,6 +12,9 @@ import Text.Read
 import Actions
 import Board
 import Types 
+
+newtype GameM a = GameM (IO a)
+  deriving (Functor, Monad, Applicative, MonadIO)
 
 main :: IO ()
 main = do 
