@@ -14,12 +14,25 @@ import Board
 import Types 
 
 newtype GameM a = GameM (IO a)
-  deriving (Functor, Monad, Applicative, MonadIO)
+  deriving (Functor, Applicative, Monad, MonadIO)
+
+gameAdd :: GameM Int -> GameM Int -> GameM Int
+gameAdd = undefined
+
+startingState :: State
+startingState = (State Black startingBoard)
 
 main :: IO ()
 main = do 
-  let startingState = (State Black startingBoard)
   runGame startingState
+
+play :: GameM ()
+play = do
+  runGame' startingState
+
+-- Lowkey useless, but it compiles
+runGame' :: State -> GameM ()
+runGame' s = liftIO $ runGame s
 
 runGame :: State -> IO ()
 runGame state@(State disc board) = do
@@ -59,9 +72,16 @@ discName :: Disc -> String
 discName White = "White"
 discName Black = "Black"
 
+randomGame' :: GameM ()
+randomGame' = liftIO randomGame
+
 randomGame :: IO ()
 randomGame = do
   genRandomGame (State Black startingBoard) 
+
+
+genRandomGame' :: State -> GameM ()
+genRandomGame' s = liftIO $ genRandomGame s
 
 genRandomGame :: State -> IO ()
 genRandomGame state@(State disc board) = do
@@ -80,12 +100,18 @@ genRandomGame state@(State disc board) = do
                 let newState = (State (flipDisc disc) (makeMove disc loc board))
                 genRandomGame newState 
 
+genLoc' :: State -> GameM (Int, Int)
+genLoc' s = liftIO $ genLoc s                 
+                
 genLoc :: State -> IO (Int, Int)
 genLoc state@(State disc board) = do
                                     x <- randomRIO (0,7)
                                     y <- randomRIO (0,7)
                                     let possible = possibleMoves disc board
                                     if elem (x, y) possible then return (x,y) else genLoc state
+
+gameEnd' :: State -> GameM ()
+gameEnd' s = liftIO $ gameEnd s
                                      
 gameEnd :: State -> IO ()
 gameEnd state@(State disc board) = 
@@ -97,7 +123,7 @@ gameEnd state@(State disc board) =
       else 
         putStrLn "White won! Black lost!"
       exitSuccess
-  else return () 
+  else (return ()) 
 
 noMoves :: State -> Bool
 noMoves state@(State disc board) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
