@@ -13,117 +13,97 @@ import Actions
 import Board
 import Types 
 
+main :: IO ()
+main = undefined
+
+-- Start --
 newtype GameM a = GameM (IO a)
   deriving (Functor, Applicative, Monad, MonadIO)
 
-gameAdd :: GameM Int -> GameM Int -> GameM Int
-gameAdd = undefined
-
-startingState :: State
-startingState = (State Black startingBoard)
-
-main :: IO ()
-main = do 
-  runGame startingState
-
 play :: GameM ()
 play = do
-  runGame' startingState
+  runGame startingState
 
--- Lowkey useless, but it compiles
-runGame' :: State -> GameM ()
-runGame' s = liftIO $ runGame s
-
-runGame :: State -> IO ()
+runGame :: State -> GameM ()
 runGame state@(State disc board) = do
   gameEnd state
-  putBoard board
+  writeBoard board
 
   case possibleMoves disc board of
     []     -> do
-                putStrLn $ passMessage disc
+                liftIO $ putStrLn $ passMessage disc
                 runGame (State (flipDisc disc) board)
     (x:xs) -> do
-                putStrLn $ moveMessage disc
-                input <- getLine
+                liftIO $ putStrLn $ moveMessage disc
+                input <- liftIO $ getLine
                   
                 case readMaybe input of
                   Nothing    -> do
-                                  putStrLn "Invalid input. Try Again."
+                                  liftIO $ putStrLn "Invalid input. Try Again."
                                   runGame state
                   (Just loc) -> do
                                   let possible = possibleMoves disc board
                                   if (elem loc possible) then
                                     do   
-                                      putStrLn "Valid location."
+                                      liftIO $ putStrLn "Valid location."
                                       runGame (State (flipDisc disc) (makeMove disc loc board))
                                   else
                                     do 
-                                      putStrLn "Can't make that move. Try Again."
-                                      runGame state 
-                                      
-passMessage :: Disc -> String
-passMessage disc = (discName disc) ++ " passes..."  
-      
-moveMessage :: Disc -> String
-moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+                                      liftIO $ putStrLn "Can't make that move. Try Again."
+                                      runGame state
 
-discName :: Disc -> String
-discName White = "White"
-discName Black = "Black"
+randomGame :: GameM ()
+randomGame = do 
+  genRandomGame (State Black startingBoard)
 
-randomGame' :: GameM ()
-randomGame' = liftIO randomGame
-
-randomGame :: IO ()
-randomGame = do
-  genRandomGame (State Black startingBoard) 
-
-
-genRandomGame' :: State -> GameM ()
-genRandomGame' s = liftIO $ genRandomGame s
-
-genRandomGame :: State -> IO ()
+genRandomGame :: State -> GameM ()
 genRandomGame state@(State disc board) = do
   gameEnd state
-  putBoard board   
+  writeBoard board   
   case possibleMoves disc board of
     []     -> do
-                putStrLn "#PASS#"
+                liftIO $ putStrLn "#PASS#"
                 let newState = (State (flipDisc disc) board)
                 genRandomGame newState 
     (x:xs) -> do
-                print disc
+                liftIO $ print disc
                 loc <- genLoc state
-                putStr "Move: "
-                print loc
+                liftIO $ putStr "Move: "
+                liftIO $ print loc
                 let newState = (State (flipDisc disc) (makeMove disc loc board))
-                genRandomGame newState 
+                genRandomGame newState  
 
-genLoc' :: State -> GameM (Int, Int)
-genLoc' s = liftIO $ genLoc s                 
-                
-genLoc :: State -> IO (Int, Int)
+genLoc :: State -> GameM (Int, Int)
 genLoc state@(State disc board) = do
-                                    x <- randomRIO (0,7)
-                                    y <- randomRIO (0,7)
-                                    let possible = possibleMoves disc board
-                                    if elem (x, y) possible then return (x,y) else genLoc state
-
-gameEnd' :: State -> GameM ()
-gameEnd' s = liftIO $ gameEnd s
-                                     
-gameEnd :: State -> IO ()
+  let possible = possibleMoves disc board
+  x <- liftIO $ randomRIO (0,7) 
+  y <- liftIO $ randomRIO (0,7) 
+  if elem (x, y) possible then return (x,y) else genLoc state         
+                
+gameEnd :: State -> GameM ()
 gameEnd state@(State disc board) = 
   if noMoves state then
     do 
-      putBoard board
+      writeBoard board
       if (isWinner Black board) then
-        putStrLn "Black won! White lost!"
+        liftIO $ putStrLn "Black won! White lost!"
       else 
-        putStrLn "White won! Black lost!"
-      exitSuccess
-  else (return ()) 
+        liftIO $ putStrLn "White won! Black lost!"
+  else return ()
+                                     
+writeBoard :: Board -> GameM ()
+writeBoard b = liftIO $ putBoard b
+
+-- Helper functions --
+
+gameInt :: GameM Int
+gameInt = GameM $ randomRIO (0, 7) 
+
+gameAdd :: GameM Int -> GameM Int -> GameM Int
+gameAdd x y = liftM2 (+) x y 
+
+startingState :: State
+startingState = (State Black startingBoard)
 
 noMoves :: State -> Bool
 noMoves state@(State disc board) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
@@ -135,4 +115,14 @@ isWinner disc board = answer
     step2  = map snd step1
     step31 = filter (\d1 -> d1 == disc) step2
     step32 = filter (\d2 -> d2 == (flipDisc disc)) step2
-    answer = (length step31) > (length step32) 
+    answer = (length step31) > (length step32)
+
+passMessage :: Disc -> String
+passMessage disc = (discName disc) ++ " passes..."  
+    
+moveMessage :: Disc -> String
+moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+
+discName :: Disc -> String
+discName White = "White"
+discName Black = "Black"
