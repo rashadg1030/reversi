@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module Main where
   
@@ -13,44 +14,63 @@ import Actions
 import Board
 import Types 
 
-main :: IO ()
-main = undefined
-
--- Start --
 newtype GameM a = GameM (IO a)
   deriving (Functor, Applicative, Monad, MonadIO)
 
-play :: GameM ()
-play = do
-  runGame startingState
+{-
+Abstract the print-like functions with a monadic type class named Logger. Give GameM an instance of logger with the liftIO definitions
+The idea is to abstract over IO functions
+-}
 
-runGame :: State -> GameM ()
-runGame state@(State disc board) = do
+class Monad m => Logger m where
+  writeMessage :: String -> m ()
+  writeBoard :: Board -> m ()
+
+
+instance Logger (GameM) where
+  writeMessage :: String -> GameM ()
+  writeMessage = liftIO . putStrLn
+
+  writeBoard :: Board -> GameM ()
+  writeBoard = liftIO . putBoard
+
+ 
+main :: IO ()
+main = runGameM play
+
+runGameM :: GameM a -> IO a
+runGameM (GameM io) = io 
+
+play :: GameM ()
+play = stepGame startingState
+
+stepGame :: State -> GameM ()
+stepGame state@(State disc board) = do
   gameEnd state
   writeBoard board
 
   case possibleMoves disc board of
     []     -> do
-                liftIO $ putStrLn $ passMessage disc
-                runGame (State (flipDisc disc) board)
+                writeMessage $ passMessage disc
+                stepGame (State (flipDisc disc) board)
     (x:xs) -> do
-                liftIO $ putStrLn $ moveMessage disc
+                writeMessage $ moveMessage disc
                 input <- liftIO $ getLine
                   
                 case readMaybe input of
                   Nothing    -> do
-                                  liftIO $ putStrLn "Invalid input. Try Again."
-                                  runGame state
+                                  writeMessage "Invalid input. Try Again."
+                                  stepGame state
                   (Just loc) -> do
                                   let possible = possibleMoves disc board
                                   if (elem loc possible) then
                                     do   
-                                      liftIO $ putStrLn "Valid location."
-                                      runGame (State (flipDisc disc) (makeMove disc loc board))
+                                      writeMessage "Valid location."
+                                      stepGame (State (flipDisc disc) (makeMove disc loc board))
                                   else
                                     do 
-                                      liftIO $ putStrLn "Can't make that move. Try Again."
-                                      runGame state
+                                      writeMessage "Can't make that move. Try Again."
+                                      stepGame state
 
 randomGame :: GameM ()
 randomGame = do 
@@ -62,14 +82,13 @@ genRandomGame state@(State disc board) = do
   writeBoard board   
   case possibleMoves disc board of
     []     -> do
-                liftIO $ putStrLn "#PASS#"
+                writeMessage "#PASS#"
                 let newState = (State (flipDisc disc) board)
                 genRandomGame newState 
     (x:xs) -> do
-                liftIO $ print disc
+                writeMessage (show disc)
                 loc <- genLoc state
-                liftIO $ putStr "Move: "
-                liftIO $ print loc
+                writeMessage $ "Move: " ++ (show loc) 
                 let newState = (State (flipDisc disc) (makeMove disc loc board))
                 genRandomGame newState  
 
@@ -86,21 +105,11 @@ gameEnd state@(State disc board) =
     do 
       writeBoard board
       if (isWinner Black board) then
-        liftIO $ putStrLn "Black won! White lost!"
+        writeMessage "Black won! White lost!"
       else 
-        liftIO $ putStrLn "White won! Black lost!"
+        writeMessage "White won! Black lost!"
   else return ()
-                                     
-writeBoard :: Board -> GameM ()
-writeBoard b = liftIO $ putBoard b
-
 -- Helper functions --
-
-gameInt :: GameM Int
-gameInt = GameM $ randomRIO (0, 7) 
-
-gameAdd :: GameM Int -> GameM Int -> GameM Int
-gameAdd x y = liftM2 (+) x y 
 
 startingState :: State
 startingState = (State Black startingBoard)
@@ -118,11 +127,7 @@ isWinner disc board = answer
     answer = (length step31) > (length step32)
 
 passMessage :: Disc -> String
-passMessage disc = (discName disc) ++ " passes..."  
+passMessage disc = (show disc) ++ " passes..."  
     
 moveMessage :: Disc -> String
-moveMessage disc = (discName disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
-
-discName :: Disc -> String
-discName White = "White"
-discName Black = "Black"
+moveMessage disc = (show disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
