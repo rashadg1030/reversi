@@ -17,17 +17,12 @@ import Types
 newtype GameM a = GameM (IO a)
   deriving (Functor, Applicative, Monad, MonadIO)
 
-{-
-Abstract the print-like functions with a monadic type class named Logger. Give GameM an instance of logger with the liftIO definitions
-The idea is to abstract over IO functions
--}
-
 class Monad m => Logger m where
   writeMoveMessage :: Disc -> Location -> m ()
   writePassMessage :: Disc -> m ()
+  writeFailMessage :: Disc -> m ()
   writePrompt :: Disc -> m ()
   writeFinalMessage :: Final -> m ()
-  writeFailMessage :: m ()
   writeBoard :: Board -> m ()
 
 class Monad m => Control m where
@@ -40,15 +35,15 @@ instance Logger (GameM) where
   writePassMessage :: Disc -> GameM ()
   writePassMessage disc = liftIO . putStrLn . ((show disc) ++) $ " passes..."
 
+  writeFailMessage :: Disc -> GameM ()
+  writeFailMessage d = liftIO . putStrLn $ (show d) ++ " made an invalid move."
+
   writePrompt :: Disc -> GameM ()
   writePrompt disc = liftIO . putStrLn . ((show disc) ++) $ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
 
   writeFinalMessage :: Final -> GameM ()
   writeFinalMessage (Win disc) = liftIO . putStrLn $ (show disc) ++ " won! " ++ (show . flipDisc $ disc) ++ " lost!"
   writeFinalMessage Tie        = liftIO . putStrLn $ "It's a tie!" 
-
-  writeFailMessage :: GameM ()
-  writeFailMessage = liftIO . putStrLn $ "Invalid move."
 
   writeBoard :: Board -> GameM ()
   writeBoard = liftIO . putBoard
@@ -60,6 +55,7 @@ instance Control (GameM) where
               case (readMaybe input) :: Maybe (Int, Int) of 
                 (Just loc) -> return loc
                 Nothing    -> return (9, 9) 
+  -- Should getFinal go here ??
 
 main :: IO ()
 main = runGameM play
@@ -89,37 +85,11 @@ stepGame state@(State disc board) = do
                     stepGame (State (flipDisc disc) (makeMove disc loc board))
                 else 
                   do
-                    writeFailMessage
+                    writeFailMessage disc
                     stepGame state 
 
-randomGame :: GameM ()
-randomGame = do 
-  genRandomGame (State Black startingBoard)
-
-genRandomGame :: State -> GameM ()
-genRandomGame state@(State disc board) = do
-  gameEnd state
-  writeBoard board   
-  case possibleMoves disc board of
-    []     -> do
-                writePassMessage disc
-                let newState = (State (flipDisc disc) board)
-                genRandomGame newState 
-    moves  -> do
-                loc <- genLoc state
-                writeMoveMessage disc loc 
-                let newState = (State (flipDisc disc) (makeMove disc loc board))
-                genRandomGame newState  
-
-genLoc :: State -> GameM (Int, Int)
-genLoc state@(State disc board) = do
-  let possible = possibleMoves disc board
-  x <- liftIO $ randomRIO (0,7) 
-  y <- liftIO $ randomRIO (0,7) 
-  if elem (x, y) possible then return (x,y) else genLoc state         
-                
 gameEnd :: State -> GameM ()
-gameEnd state@(State disc board) = 
+gameEnd state@(State _ board) = 
   if noMoves state then
     do 
       writeBoard board
@@ -142,3 +112,30 @@ getFinal board = if step31 == step32 then Tie else Win greater
     step31  = length $ filter (\d1 -> d1 == White) step2
     step32  = length $ filter (\d2 -> d2 == Black) step2
     greater = if step31 > step32 then White else Black
+
+-- Generate Random Game --
+randomGame :: GameM ()
+randomGame = do 
+  genRandomGame (State Black startingBoard)
+    
+genRandomGame :: State -> GameM ()
+genRandomGame state@(State disc board) = do
+  gameEnd state
+  writeBoard board   
+  case possibleMoves disc board of
+    []     -> do
+                writePassMessage disc
+                let newState = (State (flipDisc disc) board)
+                genRandomGame newState 
+    _      -> do
+                loc <- genLoc state
+                writeMoveMessage disc loc 
+                let newState = (State (flipDisc disc) (makeMove disc loc board))
+                genRandomGame newState  
+                   
+genLoc :: State -> GameM (Int, Int)
+genLoc state@(State disc board) = do
+  let possible = possibleMoves disc board
+  x <- liftIO $ randomRIO (0,7) 
+  y <- liftIO $ randomRIO (0,7) 
+  if elem (x, y) possible then return (x,y) else genLoc state    
