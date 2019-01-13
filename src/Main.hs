@@ -24,7 +24,7 @@ class Monad m => Logger m where
 
 class Monad m => Control m where
   getInput :: m Location
-  -- getFinal :: m Final
+  -- getFinal :: Board -> m Final
 
 instance Logger (GameM) where
   writeMoveMessage :: Disc -> Location -> GameM ()
