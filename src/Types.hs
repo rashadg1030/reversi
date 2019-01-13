@@ -7,6 +7,8 @@ data State = State Disc Board
 
 data Disc = Black | White
     deriving (Show, Eq)
+
+data Final = Win Disc | Tie 
   
 type Cell = Maybe Disc
 

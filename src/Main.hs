@@ -23,23 +23,43 @@ The idea is to abstract over IO functions
 -}
 
 class Monad m => Logger m where
-  writeMessage :: String -> m ()
+  writeMoveMessage :: Disc -> Location -> m ()
+  writePassMessage :: Disc -> m ()
+  writePrompt :: Disc -> m ()
+  writeFinalMessage :: Final -> m ()
+  writeFailMessage :: m ()
   writeBoard :: Board -> m ()
 
 class Monad m => Control m where
-  getInput :: m String
-
+  getInput :: m (Int, Int)
 
 instance Logger (GameM) where
-  writeMessage :: String -> GameM ()
-  writeMessage = liftIO . putStrLn
+  writeMoveMessage :: Disc -> Location -> GameM ()
+  writeMoveMessage disc loc = liftIO . putStrLn $ (show disc) ++ " disc placed at " ++ (show loc) ++ "."
+
+  writePassMessage :: Disc -> GameM ()
+  writePassMessage disc = liftIO . putStrLn . ((show disc) ++) $ " passes..."
+
+  writePrompt :: Disc -> GameM ()
+  writePrompt disc = liftIO . putStrLn . ((show disc) ++) $ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+
+  writeFinalMessage :: Final -> GameM ()
+  writeFinalMessage (Win disc) = liftIO . putStrLn $ (show disc) ++ " won! " ++ (show . flipDisc $ disc) ++ " lost!"
+  writeFinalMessage Tie        = liftIO . putStrLn $ "It's a tie!" 
+
+  writeFailMessage :: GameM ()
+  writeFailMessage = liftIO . putStrLn $ "Invalid move."
 
   writeBoard :: Board -> GameM ()
   writeBoard = liftIO . putBoard
 
 instance Control (GameM) where
-  getInput :: GameM String
-  getInput = liftIO $ getLine
+  getInput :: GameM (Int, Int)
+  getInput = do
+              input <- liftIO $ getLine
+              case (readMaybe input) :: Maybe (Int, Int) of 
+                (Just loc) -> return loc
+                Nothing    -> return (9, 9) 
 
 main :: IO ()
 main = runGameM play
@@ -57,25 +77,20 @@ stepGame state@(State disc board) = do
 
   case possibleMoves disc board of
     []     -> do
-                writeMessage $ passMessage disc
+                writePassMessage disc
                 stepGame (State (flipDisc disc) board)
     moves  -> do
-                writeMessage $ moveMessage disc
-                input <- getInput
-                  
-                case readMaybe input of
-                  Nothing    -> do
-                                  writeMessage "Invalid input. Try Again."
-                                  stepGame state
-                  (Just loc) -> do
-                                  if (elem loc moves) then
-                                    do   
-                                      writeMessage "Valid location."
-                                      stepGame (State (flipDisc disc) (makeMove disc loc board))
-                                  else
-                                    do 
-                                      writeMessage "Can't make that move. Try Again."
-                                      stepGame state
+                writePrompt disc
+                loc <- getInput
+
+                if elem loc moves then 
+                  do
+                    writeMoveMessage disc loc
+                    stepGame (State (flipDisc disc) (makeMove disc loc board))
+                else 
+                  do
+                    writeFailMessage
+                    stepGame state 
 
 randomGame :: GameM ()
 randomGame = do 
@@ -87,13 +102,12 @@ genRandomGame state@(State disc board) = do
   writeBoard board   
   case possibleMoves disc board of
     []     -> do
-                writeMessage "#PASS#"
+                writePassMessage disc
                 let newState = (State (flipDisc disc) board)
                 genRandomGame newState 
-    (x:xs) -> do
-                writeMessage (show disc)
+    moves  -> do
                 loc <- genLoc state
-                writeMessage $ "Move: " ++ (show loc) 
+                writeMoveMessage disc loc 
                 let newState = (State (flipDisc disc) (makeMove disc loc board))
                 genRandomGame newState  
 
@@ -109,30 +123,22 @@ gameEnd state@(State disc board) =
   if noMoves state then
     do 
       writeBoard board
-      if (isWinner Black board) then
-        writeMessage "Black won! White lost!"
-      else 
-        writeMessage "White won! Black lost!"
+      let final = getFinal board
+      writeFinalMessage final
   else return ()
--- Helper functions --
 
+-- Helper functions --
 startingState :: State
 startingState = (State Black startingBoard)
 
 noMoves :: State -> Bool
-noMoves state@(State disc board) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
+noMoves (State disc board) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
 
-isWinner :: Disc -> Board -> Bool
-isWinner disc board = answer
+getFinal :: Board -> Final
+getFinal board = if step31 == step32 then Tie else Win greater
   where
-    step1  = Map.toList board 
-    step2  = map snd step1
-    step31 = filter (\d1 -> d1 == disc) step2
-    step32 = filter (\d2 -> d2 == (flipDisc disc)) step2
-    answer = (length step31) > (length step32)
-
-passMessage :: Disc -> String
-passMessage disc = (show disc) ++ " passes..."  
-    
-moveMessage :: Disc -> String
-moveMessage disc = (show disc) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+    step1   = Map.toList board 
+    step2   = map snd step1
+    step31  = length $ filter (\d1 -> d1 == White) step2
+    step32  = length $ filter (\d2 -> d2 == Black) step2
+    greater = if step31 > step32 then White else Black
