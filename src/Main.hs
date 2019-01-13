@@ -4,11 +4,8 @@
 module Main where
   
 import qualified Data.Map.Strict as Map
-import Control.Monad
 import Control.Monad.IO.Class
-import System.Exit (exitSuccess)
 import System.Random (randomRIO)
-import Data.Maybe
 import Text.Read
 import Actions
 import Board
@@ -26,7 +23,8 @@ class Monad m => Logger m where
   writeBoard :: Board -> m ()
 
 class Monad m => Control m where
-  getInput :: m (Int, Int)
+  getInput :: m Location
+  -- getFinal :: m Final
 
 instance Logger (GameM) where
   writeMoveMessage :: Disc -> Location -> GameM ()
@@ -49,10 +47,10 @@ instance Logger (GameM) where
   writeBoard = liftIO . putBoard
 
 instance Control (GameM) where
-  getInput :: GameM (Int, Int)
+  getInput :: GameM Location
   getInput = do
               input <- liftIO $ getLine
-              case (readMaybe input) :: Maybe (Int, Int) of 
+              case (readMaybe input) :: Maybe Location of 
                 (Just loc) -> return loc
                 Nothing    -> return (9, 9) 
   -- Should getFinal go here ??
@@ -78,7 +76,6 @@ stepGame state@(State disc board) = do
     moves  -> do
                 writePrompt disc
                 loc <- getInput
-
                 if elem loc moves then 
                   do
                     writeMoveMessage disc loc
