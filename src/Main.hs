@@ -26,6 +26,9 @@ class Monad m => Logger m where
   writeMessage :: String -> m ()
   writeBoard :: Board -> m ()
 
+class Monad m => Control m where
+  getInput :: m String
+
 
 instance Logger (GameM) where
   writeMessage :: String -> GameM ()
@@ -34,7 +37,10 @@ instance Logger (GameM) where
   writeBoard :: Board -> GameM ()
   writeBoard = liftIO . putBoard
 
- 
+instance Control (GameM) where
+  getInput :: GameM String
+  getInput = liftIO $ getLine
+
 main :: IO ()
 main = runGameM play
 
@@ -53,17 +59,16 @@ stepGame state@(State disc board) = do
     []     -> do
                 writeMessage $ passMessage disc
                 stepGame (State (flipDisc disc) board)
-    (x:xs) -> do
+    moves  -> do
                 writeMessage $ moveMessage disc
-                input <- liftIO $ getLine
+                input <- getInput
                   
                 case readMaybe input of
                   Nothing    -> do
                                   writeMessage "Invalid input. Try Again."
                                   stepGame state
                   (Just loc) -> do
-                                  let possible = possibleMoves disc board
-                                  if (elem loc possible) then
+                                  if (elem loc moves) then
                                     do   
                                       writeMessage "Valid location."
                                       stepGame (State (flipDisc disc) (makeMove disc loc board))
