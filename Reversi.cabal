@@ -1,8 +1,10 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 30fa303f610ae53b39ef834ce97a67a58024cd03eb12aa85b5a3e7506493174c
+-- hash: 07538e56f8f597d9aac01194891b7de93e1a127e8a2574da9a00c4472806ae10
 
 name:           Reversi
 version:        0.31.0
@@ -12,9 +14,9 @@ category:       Experimental
 homepage:       https://github.com/https://github.com/rashadg1030#readme
 bug-reports:    https://github.com/https://github.com/rashadg1030/issues
 maintainer:     Rashad Gover <rashad.sasaki@gmail.com>
+license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
-cabal-version:  >= 1.10
 
 source-repository head
   type: git
@@ -53,6 +55,6 @@ test-suite spec
     , containers
     , hspec ==2.*
     , random
-  build-tools:
-      hspec-discover
+  build-tool-depends:
+      hspec-discover:hspec-discover
   default-language: Haskell2010
