@@ -24,7 +24,6 @@ class Monad m => Logger m where
 
 class Monad m => Control m where
   getInput :: m Location
-  -- getFinal :: Board -> m Final
 
 instance Logger (GameM) where
   writeMoveMessage :: Disc -> Location -> GameM ()
@@ -53,7 +52,6 @@ instance Control (GameM) where
               case (readMaybe input) :: Maybe Location of 
                 (Just loc) -> return loc
                 Nothing    -> return (9, 9) 
-  -- Should getFinal go here ??
 
 main :: IO ()
 main = runGameM play
