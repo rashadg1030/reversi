@@ -17,11 +17,6 @@ import Types
 newtype GameM a = GameM (IO a)
   deriving (Functor, Applicative, Monad, MonadIO)
 
-{-
-Abstract the print-like functions with a monadic type class named Logger. Give GameM an instance of logger with the liftIO definitions
-The idea is to abstract over IO functions
--}
-
 class Monad m => Logger m where
   writeMessage :: String -> m ()
   writeBoard :: Board -> m ()
@@ -109,6 +104,7 @@ gameEnd state@(State disc board) =
       else 
         writeMessage "White won! Black lost!"
   else return ()
+  
 -- Helper functions --
 
 startingState :: State

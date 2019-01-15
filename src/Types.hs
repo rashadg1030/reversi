@@ -1,7 +1,6 @@
 module Types where
 
 import Data.Map.Strict (Map)
---import Control.Monad.Trans
 
 data State = State Disc Board
 
