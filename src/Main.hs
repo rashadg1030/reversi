@@ -69,10 +69,10 @@ main = runGameM play
 runGameM :: GameM a -> IO a
 runGameM (GameM io) = io 
 
-play :: GameM ()
+play :: (Logger m, Control m) => m ()
 play = stepGame startingState
 
-stepGame :: State -> GameM ()
+stepGame :: (Logger m, Control m) => State -> m ()
 stepGame state@(State disc board) = do
   gameEnd state
   writeBoard board
@@ -93,7 +93,7 @@ stepGame state@(State disc board) = do
           writeFailMessage disc
           stepGame state 
 
-gameEnd :: State -> GameM ()
+gameEnd :: Logger m => State -> m ()
 gameEnd state@(State _ board) = 
   if noMoves state then
     do 
@@ -119,11 +119,11 @@ getFinal board = if step31 == step32 then Tie else Win greater
     greater = if step31 > step32 then White else Black
 
 -- Generate Random Game --
-randomGame :: GameM ()
+randomGame :: (Logger m, Generator m) => m ()
 randomGame = do 
   genRandomGame (State Black startingBoard)
     
-genRandomGame :: State -> GameM ()
+genRandomGame :: (Logger m, Generator m) => State -> m ()
 genRandomGame state@(State disc board) = do
   gameEnd state
   writeBoard board   
@@ -138,9 +138,8 @@ genRandomGame state@(State disc board) = do
       let newState = (State (flipDisc disc) (makeMove disc loc board))
       genRandomGame newState  
                    
-genLoc :: State -> GameM (Int, Int)
+genLoc :: Generator m => State -> m (Int, Int)
 genLoc state@(State disc board) = do
   let possible = possibleMoves disc board
   loc <- randomLoc
   if elem loc possible then return loc else genLoc state         
-                
