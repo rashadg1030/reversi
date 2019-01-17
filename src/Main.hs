@@ -25,7 +25,10 @@ class Monad m => Logger m where
 class Monad m => Control m where
   getInput :: m Location
 
-instance Logger (GameM) where
+class Monad m => Generator m where 
+  randomLoc :: m Location
+
+instance Logger GameM where
   writeMoveMessage :: Disc -> Location -> GameM ()
   writeMoveMessage disc loc = liftIO . putStrLn $ (show disc) ++ " disc placed at " ++ (show loc) ++ "."
 
@@ -45,13 +48,20 @@ instance Logger (GameM) where
   writeBoard :: Board -> GameM ()
   writeBoard = liftIO . putBoard
 
-instance Control (GameM) where
+instance Control GameM where
   getInput :: GameM Location
   getInput = do
-              input <- liftIO $ getLine
-              case (readMaybe input) :: Maybe Location of 
-                (Just loc) -> return loc
-                Nothing    -> return (9, 9) 
+    input <- liftIO $ getLine
+    case (readMaybe input) :: Maybe Location of 
+      (Just loc) -> return loc
+      Nothing    -> return (9, 9)
+                
+instance Generator GameM where
+  randomLoc :: GameM Location
+  randomLoc = do
+    x <- liftIO $ randomRIO (0,7)
+    y <- liftIO $ randomRIO (0,7)
+    return (x, y)
 
 main :: IO ()
 main = runGameM play
@@ -68,20 +78,20 @@ stepGame state@(State disc board) = do
   writeBoard board
 
   case possibleMoves disc board of
-    []     -> do
-                writePassMessage disc
-                stepGame (State (flipDisc disc) board)
-    moves  -> do
-                writePrompt disc
-                loc <- getInput
-                if elem loc moves then 
-                  do
-                    writeMoveMessage disc loc
-                    stepGame (State (flipDisc disc) (makeMove disc loc board))
-                else 
-                  do
-                    writeFailMessage disc
-                    stepGame state 
+    [] -> do
+      writePassMessage disc
+      stepGame (State (flipDisc disc) board)
+    moves -> do
+      writePrompt disc
+      loc <- getInput
+      if elem loc moves then 
+        do
+          writeMoveMessage disc loc
+          stepGame (State (flipDisc disc) (makeMove disc loc board))
+      else 
+        do
+          writeFailMessage disc
+          stepGame state 
 
 gameEnd :: State -> GameM ()
 gameEnd state@(State _ board) = 
@@ -118,20 +128,19 @@ genRandomGame state@(State disc board) = do
   gameEnd state
   writeBoard board   
   case possibleMoves disc board of
-    []     -> do
-                writePassMessage disc
-                let newState = (State (flipDisc disc) board)
-                genRandomGame newState 
-    _      -> do
-                loc <- genLoc state
-                writeMoveMessage disc loc 
-                let newState = (State (flipDisc disc) (makeMove disc loc board))
-                genRandomGame newState  
+    [] -> do
+      writePassMessage disc
+      let newState = (State (flipDisc disc) board)
+      genRandomGame newState 
+    _  -> do
+      loc <- genLoc state
+      writeMoveMessage disc loc 
+      let newState = (State (flipDisc disc) (makeMove disc loc board))
+      genRandomGame newState  
                    
 genLoc :: State -> GameM (Int, Int)
 genLoc state@(State disc board) = do
   let possible = possibleMoves disc board
-  x <- liftIO $ randomRIO (0,7) 
-  y <- liftIO $ randomRIO (0,7) 
-  if elem (x, y) possible then return (x,y) else genLoc state         
+  loc <- randomLoc
+  if elem loc possible then return loc else genLoc state         
                 

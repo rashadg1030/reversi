@@ -5,7 +5,7 @@ import Data.Map.Strict (Map)
 
 import Types
 
-{-Start-}
+-- Start --
 putBoard :: Board -> IO ()
 putBoard board = putStr step4
                    where 
@@ -211,4 +211,3 @@ testBoard5 = makeBoard [((0,7), White), ((1,6), Black), ((2,5), Black), ((3,4), 
 
 makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
-{-End-}
