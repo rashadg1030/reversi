@@ -19,10 +19,7 @@ capBoard x = "---------------------------------\n" ++ x
 
 cellMapToString :: [(Location, Cell)] -> String
 cellMapToString [] = ""
-cellMapToString (((x, _), c):t) =  if x == 7 then 
-                                        (cellToString c) ++ line 
-                                      else 
-                                        (cellToString c) ++ cellMapToString t
+cellMapToString (((x, _), c):t) = cellToString c ++ (if x == 7 then line else "") ++ cellMapToString t 
                                    where 
                                     line = "|\n---------------------------------\n"
 
