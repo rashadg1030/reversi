@@ -47,7 +47,7 @@ instance Logger GameM where
   writeFinalMessage Tie        = liftIO . putStrLn $ "It's a tie!" 
 
   writePossibleMoves :: Disc -> Board -> GameM ()
-  writePossibleMoves d = (liftIO . putStrLn . show . possibleMoves d)
+  writePossibleMoves d = (liftIO . putStrLn . ("Possible Moves: "++) . show . possibleMoves d)
 
   writeBoard :: Board -> GameM ()
   writeBoard = liftIO . putBoard
@@ -87,6 +87,7 @@ stepGame state@(State disc board) = do
       stepGame (State (flipDisc disc) board)
     moves -> do
       writePrompt disc
+      writePossibleMoves disc board
       loc <- getInput
       if elem loc moves then 
         do

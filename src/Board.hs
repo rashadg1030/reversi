@@ -15,13 +15,13 @@ putBoard board = putStr step4
                     step4 = capBoard step3
 
 capBoard :: String -> String 
-capBoard x = "---------------------------------\n" ++ x
+capBoard x = "| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |\n" ++ "---------------------------------~~~\n" ++ x
 
 cellMapToString :: [(Location, Cell)] -> String
 cellMapToString [] = ""
-cellMapToString (((x, _), c):t) = cellToString c ++ (if x == 7 then line else "") ++ cellMapToString t 
+cellMapToString (((x, y), c):t) = cellToString c ++ (if x == 7 then line else "") ++ cellMapToString t 
                                    where 
-                                    line = "|\n---------------------------------\n"
+                                    line = "| " ++ (show y) ++ "\n---------------------------------~~~\n"
 
 cellToString :: Cell -> String
 cellToString (Nothing)    = "|   " 
@@ -63,6 +63,7 @@ startingBoard = makeBoard [((3,3), White), ((4,3), Black), ((3,4), Black), ((4,4
 |   |   |   |   |   |   |   |   |
 ---------------------------------
 |   |   |   |   |   |   |   |   |
+---------------------------------
 -}
 
 testBoard1 :: Board 
