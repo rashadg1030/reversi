@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 30fa303f610ae53b39ef834ce97a67a58024cd03eb12aa85b5a3e7506493174c
+-- hash: b22e2950acff88edf0141ccbd26cdf7c717a07b7b8406304ccb2b877bae47f61
 
 name:           Reversi
 version:        0.31.0
@@ -32,7 +32,9 @@ executable Reversi
   build-depends:
       base >=4.9 && <5
     , containers
+    , mtl
     , random
+    , transformers
   default-language: Haskell2010
 
 test-suite spec
@@ -52,7 +54,9 @@ test-suite spec
       base >=4.9 && <5
     , containers
     , hspec ==2.*
+    , mtl
     , random
+    , transformers
   build-tools:
       hspec-discover
   default-language: Haskell2010

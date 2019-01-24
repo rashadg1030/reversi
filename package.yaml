@@ -12,6 +12,8 @@ dependencies:
   - base >= 4.9 && < 5
   - containers
   - random
+  - mtl
+  - transformers
 
 executable:
   main: Main.hs
