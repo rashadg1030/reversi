@@ -300,9 +300,9 @@ getRowKeys (_, y) = [(a, y) | a <- [0..7]]
 
 flipCaptured :: ([Cell], [Cell]) -> [Cell]
 flipCaptured ([], [])                       = []
-flipCaptured ([], tail)                     = tail
+flipCaptured ([], end)                     = end
 flipCaptured (captured, [])                 = captured
-flipCaptured (captured@(c:_), tail@(t:_)) = if isOppositeCell c t then (map flipCell captured) ++ tail else captured ++ tail
+flipCaptured (captured@(c:_), end@(t:_)) = if isOppositeCell c t then (map flipCell captured) ++ end else captured ++ end
 
 flipCell :: Cell -> Cell
 flipCell Nothing      = Nothing

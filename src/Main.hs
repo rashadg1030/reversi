@@ -9,7 +9,9 @@ import System.Random (randomRIO)
 import Text.Read
 import Actions
 import Board
-import Types 
+import Types
+
+
 
 newtype GameM a = GameM (IO a)
   deriving (Functor, Applicative, Monad, MonadIO)
