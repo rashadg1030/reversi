@@ -20,6 +20,7 @@ class Monad m => Logger m where
   writeFailMessage :: Disc -> m ()
   writePrompt :: Disc -> m ()
   writeFinalMessage :: Final -> m ()
+  writePossibleMoves :: Disc -> Board -> m ()
   writeBoard :: Board -> m ()
 
 class Monad m => Control m where
@@ -44,6 +45,9 @@ instance Logger GameM where
   writeFinalMessage :: Final -> GameM ()
   writeFinalMessage (Win disc) = liftIO . putStrLn $ (show disc) ++ " won! " ++ (show . flipDisc $ disc) ++ " lost!"
   writeFinalMessage Tie        = liftIO . putStrLn $ "It's a tie!" 
+
+  writePossibleMoves :: Disc -> Board -> GameM ()
+  writePossibleMoves d = (liftIO . putStrLn . show . possibleMoves d)
 
   writeBoard :: Board -> GameM ()
   writeBoard = liftIO . putBoard
