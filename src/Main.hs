@@ -84,9 +84,6 @@ main = runGameM stepGame
 runGameM :: GameM a -> IO a
 runGameM (GameM m) = evalStateT m startingState
 
--- play :: (Logger m, Control m) => m ()
--- play = stepGame
-
 stepGame :: (Logger m, Control m, MonadState GameState m) => m ()
 stepGame = do
   gs <- get

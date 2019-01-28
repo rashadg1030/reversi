@@ -2,9 +2,9 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b22e2950acff88edf0141ccbd26cdf7c717a07b7b8406304ccb2b877bae47f61
+-- hash: 7f0a774ad452db7a83d15322e8a706826378e878eddaf3a4880580036b962f63
 
-name:           Reversi
+name:           reversi
 version:        0.31.0
 synopsis:       The game of Reversi written in Haskell.
 description:    A fun, simple board game to play with family and friends.
@@ -20,7 +20,7 @@ source-repository head
   type: git
   location: https://github.com/https://github.com/rashadg1030
 
-executable Reversi
+executable reversi
   main-is: Main.hs
   other-modules:
       Actions

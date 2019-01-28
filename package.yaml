@@ -1,4 +1,4 @@
-name: Reversi
+name: reversi
 version: 0.31.0
 synopsis: The game of Reversi written in Haskell.
 description: A fun, simple board game to play with family and friends.
