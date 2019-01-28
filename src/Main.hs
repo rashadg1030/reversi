@@ -1,8 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE TypeSynonymInstances #-} -- ??
-{-# LANGUAGE FlexibleInstances #-} -- ??
-{-# LANGUAGE FlexibleContexts #-}  -- ??
+{-# LANGUAGE TypeSynonymInstances #-} 
+{-# LANGUAGE FlexibleInstances #-} 
+{-# LANGUAGE FlexibleContexts #-}  
 
 module Main where
   
