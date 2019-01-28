@@ -15,9 +15,11 @@ import Board
 import Types
 import Control.Monad.State.Lazy
 
-type Action = (Disc, Location)
+-- type Action = (Disc, Location)
 
-data GameState = GameState { currentDisc :: Disc, currentBoard :: Board, frames :: [Action]  }
+-- type Frame = (Board, Action)
+
+data GameState = GameState { currentDisc :: Disc, currentBoard :: Board, frames :: [GameState]  }
   deriving (Show, Eq)
 
 newtype GameM a = GameM (StateT GameState IO a)
@@ -102,9 +104,8 @@ stepGame = do
       loc <- getInput
       if elem loc moves then 
         do
-          modify $ playDisc loc
           writeMoveMessage disc loc
-          modify changePlayer
+          modify $ play loc
           stepGame 
       else 
         do
@@ -126,6 +127,21 @@ startingState :: GameState
 startingState = GameState Black startingBoard []
 
 -- For modifying GameState
+play :: Location -> GameState -> GameState
+play loc gs = addFrame new old
+      where 
+        new :: GameState 
+        new = (changePlayer . (playDisc loc)) gs
+        old :: GameState
+        old = gs
+
+addFrame :: GameState -> GameState -> GameState
+addFrame (GameState disc board fs) old = GameState disc board (old:fs)  
+
+rewind :: GameState -> GameState
+rewind (GameState disc board []) = GameState disc board [] 
+rewind (GameState _ _ (f:fs))    = GameState (currentDisc f) (currentBoard f) (fs)  
+
 playDisc :: Location -> GameState -> GameState
 playDisc loc (GameState disc board fs) = GameState disc (makeMove disc loc board) fs
 
