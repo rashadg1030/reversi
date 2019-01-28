@@ -107,10 +107,15 @@ stepGame = do
           writeMoveMessage disc loc
           modify $ play loc
           stepGame 
-      else 
-        do
-          writeFailMessage disc
-          stepGame
+      else
+        if loc == ((-1), (-1)) then
+          do 
+            modify $ rewind
+            stepGame
+        else 
+          do
+            writeFailMessage disc
+            stepGame
 
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
 gameEnd = do
@@ -140,7 +145,7 @@ addFrame (GameState disc board fs) old = GameState disc board (old:fs)
 
 rewind :: GameState -> GameState
 rewind (GameState disc board []) = GameState disc board [] 
-rewind (GameState _ _ (f:fs))    = GameState (currentDisc f) (currentBoard f) (fs)  
+rewind (GameState _ _ (f:fs))    = GameState (currentDisc f) (currentBoard f) fs  
 
 playDisc :: Location -> GameState -> GameState
 playDisc loc (GameState disc board fs) = GameState disc (makeMove disc loc board) fs
