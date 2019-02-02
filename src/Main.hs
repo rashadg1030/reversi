@@ -15,10 +15,6 @@ import Board
 import Types
 import Control.Monad.State.Lazy
 
--- type Action = (Disc, Location)
-
--- type Frame = (Board, Action)
-
 data GameState = GameState { currentDisc :: Disc, currentBoard :: Board, frames :: [GameState]  }
   deriving (Show, Eq)
 
@@ -110,7 +106,7 @@ stepGame = do
       else
         if loc == ((-1), (-1)) then
           do 
-            modify $ rewind
+            modify rewind
             stepGame
         else 
           do
@@ -166,27 +162,28 @@ getFinal (GameState _ board _) = if step31 == step32 then Tie else Win greater
     greater = if step31 > step32 then White else Black
 
 -- Generate Random Game --
--- randomGame :: (Logger m, Generator m) => m ()
--- randomGame = do 
---   genRandomGame (State Black startingBoard)
+
+randomGame :: (Logger m, Generator m) => m ()
+randomGame = do 
+  genRandomGame (State Black startingBoard)
     
--- genRandomGame :: (Logger m, Generator m) => State -> m ()
--- genRandomGame state@(State disc board) = do
---   gameEnd state
---   writeBoard board   
---   case possibleMoves disc board of
---     [] -> do
---       writePassMessage disc
---       let newState = (State (flipDisc disc) board)
---       genRandomGame newState 
---     _  -> do
---       loc <- genLoc state
---       writeMoveMessage disc loc 
---       let newState = (State (flipDisc disc) (makeMove disc loc board))
---       genRandomGame newState  
+genRandomGame :: (Logger m, Generator m) => State -> m ()
+genRandomGame state@(State disc board) = do
+  gameEnd state
+  writeBoard board   
+  case possibleMoves disc board of
+    [] -> do
+      writePassMessage disc
+      let newState = (State (flipDisc disc) board)
+      genRandomGame newState 
+    _  -> do
+      loc <- genLoc state
+      writeMoveMessage disc loc 
+      let newState = (State (flipDisc disc) (makeMove disc loc board))
+      genRandomGame newState  
                    
--- genLoc :: Generator m => State -> m (Int, Int)
--- genLoc state@(State disc board) = do
---   let possible = possibleMoves disc board
---   loc <- randomLoc
---   if elem loc possible then return loc else genLoc state         
+genLoc :: Generator m => State -> m (Int, Int)
+genLoc state@(State disc board) = do
+  let possible = possibleMoves disc board
+  loc <- randomLoc
+  if elem loc possible then return loc else genLoc state         
