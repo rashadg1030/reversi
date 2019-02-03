@@ -129,25 +129,54 @@ main = runGameM stepGame
 runGameM :: GameM a -> IO a
 runGameM (GameM m) = evalStateT m startingState
 
+-- stepGame :: (Logger m, Control m, MonadState GameState m) => m ()
+-- stepGame = do
+--   gs <- get
+--   gameEnd
+--   let disc = currentDisc gs
+--   let board = currentBoard gs
+--   writeBoard board 
+--   case possibleMoves disc board of
+--     [] -> do
+--       writePassMessage disc
+--       modify changePlayer
+--       stepGame
+--     moves -> do
+--       writePrompt disc
+--       writePossibleMoves disc board
+--       loc <- getInput
+--       if elem loc moves then 
+--         do
+--           writeMoveMessage disc loc
+--           modify $ play loc
+--           stepGame 
+--       else
+--         if loc == ((-1), (-1)) then
+--           do 
+--             modify rewind
+--             stepGame
+--         else 
+--           do
+--             writeFailMessage disc
+--             stepGame
+
 stepGame :: (Logger m, Control m, MonadState GameState m) => m ()
 stepGame = do
   gs <- get
   gameEnd
-  let disc = currentDisc gs
-  let board = currentBoard gs
-  writeBoard board 
-  case possibleMoves disc board of
+  writeBoard gs
+  case plausibleMoves gs of
     [] -> do
-      writePassMessage disc
+      writePassMessage gs
       modify changePlayer
       stepGame
     moves -> do
-      writePrompt disc
-      writePossibleMoves disc board
+      writePrompt gs
+      writePossibleMoves gs
       loc <- getInput
       if elem loc moves then 
         do
-          writeMoveMessage disc loc
+          writeMoveMessage gs loc
           modify $ play loc
           stepGame 
       else
@@ -157,15 +186,16 @@ stepGame = do
             stepGame
         else 
           do
-            writeFailMessage disc
+            writeFailMessage gs
             stepGame
+
 
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
 gameEnd = do
   gs <- get 
   if noMoves gs then
     do 
-      writeBoard $ currentBoard gs
+      writeBoard gs
       let final = getFinal gs
       writeFinalMessage final
   else return ()
@@ -209,6 +239,10 @@ getFinal (GameState _ board _) = if step31 == step32 then Tie else Win greater
     step31  = length $ filter (\d1 -> d1 == White) step2
     step32  = length $ filter (\d2 -> d2 == Black) step2
     greater = if step31 > step32 then White else Black
+
+-- PossibleMoves for GameState
+plausibleMoves :: GameState -> [Location]
+plausibleMoves gs = possibleMoves (currentDisc gs) (currentBoard gs)
 
 -- Generate Random Game --
 
