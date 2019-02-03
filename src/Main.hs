@@ -21,14 +21,23 @@ data GameState = GameState { currentDisc :: Disc, currentBoard :: Board, frames 
 newtype GameM a = GameM (StateT GameState IO a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadState GameState) -- MonadState GameState is important
 
+-- class Monad m => Logger m where
+--   writeMoveMessage :: Disc -> Location -> m ()
+--   writePassMessage :: Disc -> m ()
+--   writeFailMessage :: Disc -> m ()
+--   writePrompt :: Disc -> m ()
+--   writeFinalMessage :: Final -> m ()
+--   writePossibleMoves :: Disc -> Board -> m ()
+--   writeBoard :: Board -> m ()
+
 class Monad m => Logger m where
-  writeMoveMessage :: Disc -> Location -> m ()
-  writePassMessage :: Disc -> m ()
-  writeFailMessage :: Disc -> m ()
-  writePrompt :: Disc -> m ()
+  writeMoveMessage :: GameState -> Location -> m ()
+  writePassMessage :: GameState -> m ()
+  writeFailMessage :: GameState -> m ()
+  writePrompt :: GameState -> m ()
+  writePossibleMoves :: GameState -> m ()
+  writeBoard :: GameState -> m ()
   writeFinalMessage :: Final -> m ()
-  writePossibleMoves :: Disc -> Board -> m ()
-  writeBoard :: Board -> m ()
 
 class Monad m => Control m where
   getInput :: m Location
@@ -36,28 +45,66 @@ class Monad m => Control m where
 class Monad m => Generator m where 
   randomLoc :: m Location
 
+-- instance Logger GameM where
+--   writeMoveMessage :: Disc -> Location -> GameM ()
+--   writeMoveMessage disc loc = liftIO . putStrLn $ (show disc) ++ " disc placed at " ++ (show loc) ++ "."
+
+--   writePassMessage :: Disc -> GameM ()
+--   writePassMessage disc = liftIO . putStrLn . ((show disc) ++) $ " passes..."
+
+--   writeFailMessage :: Disc -> GameM ()
+--   writeFailMessage d = liftIO . putStrLn $ (show d) ++ " made an invalid move."
+
+--   writePrompt :: Disc -> GameM ()
+--   writePrompt disc = liftIO . putStrLn . ((show disc) ++) $ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+
+--   writeFinalMessage :: Final -> GameM ()
+--   writeFinalMessage (Win disc) = liftIO . putStrLn $ (show disc) ++ " won! " ++ (show . flipDisc $ disc) ++ " lost!"
+--   writeFinalMessage Tie        = liftIO . putStrLn $ "It's a tie!" 
+
+--   writePossibleMoves :: Disc -> Board -> GameM ()
+--   writePossibleMoves d = (liftIO . putStrLn . ("Possible Moves: "++) . show . possibleMoves d)
+
+--   writeBoard :: Board -> GameM ()
+--   writeBoard = liftIO . putBoard
+
 instance Logger GameM where
-  writeMoveMessage :: Disc -> Location -> GameM ()
-  writeMoveMessage disc loc = liftIO . putStrLn $ (show disc) ++ " disc placed at " ++ (show loc) ++ "."
+  writeMoveMessage :: GameState -> Location -> GameM ()
+  writeMoveMessage gs loc = liftIO . putStrLn $ moveMessage
+    where
+      moveMessage :: String
+      moveMessage = (show $ currentDisc gs) ++ " disc placed at " ++ (show loc) ++ "."
 
-  writePassMessage :: Disc -> GameM ()
-  writePassMessage disc = liftIO . putStrLn . ((show disc) ++) $ " passes..."
+  writePassMessage :: GameState -> GameM ()
+  writePassMessage gs = liftIO . putStrLn $ passMessage 
+    where 
+      passMessage :: String
+      passMessage = (show $ currentDisc gs) ++ " passes..."
 
-  writeFailMessage :: Disc -> GameM ()
-  writeFailMessage d = liftIO . putStrLn $ (show d) ++ " made an invalid move."
+  writeFailMessage :: GameState -> GameM ()
+  writeFailMessage gs = liftIO . putStrLn $ failMessage 
+    where
+      failMessage :: String
+      failMessage = (show $ currentDisc gs) ++ " made an invalid move."
 
-  writePrompt :: Disc -> GameM ()
-  writePrompt disc = liftIO . putStrLn . ((show disc) ++) $ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+  writePrompt :: GameState -> GameM ()
+  writePrompt gs = liftIO . putStrLn $ prompt
+    where
+      prompt :: String
+      prompt = (show $ currentDisc gs) ++ "'s move. Enter a location in the format (x,y). Ctrl + C to quit."
+
+  writePossibleMoves :: GameState -> GameM ()
+  writePossibleMoves gs = liftIO . putStrLn $ possibleMovesMsg
+    where 
+      possibleMovesMsg :: String 
+      possibleMovesMsg = "Possible Moves: " ++ (show $ possibleMoves (currentDisc gs) (currentBoard gs))
+
+  writeBoard :: GameState -> GameM ()
+  writeBoard = liftIO . putBoard . currentBoard
 
   writeFinalMessage :: Final -> GameM ()
   writeFinalMessage (Win disc) = liftIO . putStrLn $ (show disc) ++ " won! " ++ (show . flipDisc $ disc) ++ " lost!"
   writeFinalMessage Tie        = liftIO . putStrLn $ "It's a tie!" 
-
-  writePossibleMoves :: Disc -> Board -> GameM ()
-  writePossibleMoves d = (liftIO . putStrLn . ("Possible Moves: "++) . show . possibleMoves d)
-
-  writeBoard :: Board -> GameM ()
-  writeBoard = liftIO . putBoard
 
 instance Control GameM where
   getInput :: GameM Location
@@ -148,7 +195,9 @@ playDisc loc (GameState disc board fs) = GameState disc (makeMove disc loc board
 
 changePlayer :: GameState -> GameState
 changePlayer (GameState disc board fs) = GameState (flipDisc disc) board fs
- 
+
+--
+
 noMoves :: GameState -> Bool
 noMoves (GameState disc board _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
 
