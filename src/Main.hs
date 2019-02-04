@@ -126,44 +126,15 @@ instance Generator GameM where
 main :: IO ()
 main = runGameM stepGame
 
+main' :: IO ()
+main' = runGameM genRandomGame
+
 runGameM :: GameM a -> IO a
 runGameM (GameM m) = evalStateT m startingState
-
--- stepGame :: (Logger m, Control m, MonadState GameState m) => m ()
--- stepGame = do
---   gs <- get
---   gameEnd
---   let disc = currentDisc gs
---   let board = currentBoard gs
---   writeBoard board 
---   case possibleMoves disc board of
---     [] -> do
---       writePassMessage disc
---       modify changePlayer
---       stepGame
---     moves -> do
---       writePrompt disc
---       writePossibleMoves disc board
---       loc <- getInput
---       if elem loc moves then 
---         do
---           writeMoveMessage disc loc
---           modify $ play loc
---           stepGame 
---       else
---         if loc == ((-1), (-1)) then
---           do 
---             modify rewind
---             stepGame
---         else 
---           do
---             writeFailMessage disc
---             stepGame
 
 stepGame :: (Logger m, Control m, MonadState GameState m) => m ()
 stepGame = do
   gs <- get
-  gameEnd
   writeBoard gs
   case plausibleMoves gs of
     [] -> do
@@ -188,6 +159,7 @@ stepGame = do
           do
             writeFailMessage gs
             stepGame
+  if noMoves gs then gameEnd else stepGame
 
 
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
@@ -245,28 +217,22 @@ plausibleMoves :: GameState -> [Location]
 plausibleMoves gs = possibleMoves (currentDisc gs) (currentBoard gs)
 
 -- Generate Random Game --
-
--- randomGame :: (Logger m, Generator m) => m ()
--- randomGame = do 
---   genRandomGame (State Black startingBoard)
-    
--- genRandomGame :: (Logger m, Generator m) => State -> m ()
--- genRandomGame state@(State disc board) = do
---   gameEnd state
---   writeBoard board   
---   case possibleMoves disc board of
---     [] -> do
---       writePassMessage disc
---       let newState = (State (flipDisc disc) board)
---       genRandomGame newState 
---     _  -> do
---       loc <- genLoc state
---       writeMoveMessage disc loc 
---       let newState = (State (flipDisc disc) (makeMove disc loc board))
---       genRandomGame newState  
+genRandomGame :: (Logger m, Generator m, MonadState GameState m) => m ()
+genRandomGame = do
+  gs <- get
+  writeBoard gs   
+  case plausibleMoves gs of
+    [] -> do
+      writePassMessage gs
+      modify changePlayer
+    _  -> do
+      loc <- genLoc gs
+      writeMoveMessage gs loc
+      modify $ play loc
+  if noMoves gs then gameEnd else genRandomGame
                    
--- genLoc :: Generator m => State -> m (Int, Int)
--- genLoc state@(State disc board) = do
---   let possible = possibleMoves disc board
---   loc <- randomLoc
---   if elem loc possible then return loc else genLoc state         
+genLoc :: Generator m => GameState -> m (Int, Int)
+genLoc gs = do
+  let possible = plausibleMoves gs
+  loc <- randomLoc
+  if elem loc possible then return loc else genLoc gs        
