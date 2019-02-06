@@ -14,7 +14,7 @@ If you don't have `stack` already go [here](https://docs.haskellstack.org/en/sta
 
 The rules of Reversi can be found [here](https://en.wikipedia.org/wiki/Reversi).
 
-When prompted, enter a location in the format `(x, y)`. e.g. `(2,1)`
+When prompted enter a location in the format `(x, y)`. e.g. `(2,1)`
 A list of valid locations is provided for each player, every turn.
 If the input is invalid you will prompted to try again.
 
