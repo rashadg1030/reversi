@@ -48,7 +48,7 @@ genGameTree :: Int -> GameTree -> GameTree
 genGameTree d seed
     | d <= 0 = seed
     | otherwise = case seed of
-                    Node gs []        -> genGameTree (d-1) (Node gs (gameStateToNode <$> playAll gs))
-                    Node gs gameTrees -> Node gs (map (genGameTree (d)) gameTrees)
+                    Node gs []        -> genGameTree d (Node gs (gameStateToNode <$> playAll gs))
+                    Node gs gameTrees -> Node gs (map (genGameTree (d-1)) gameTrees)
                     -- gameTrees :: [GameTree]
                     -- gs :: GameTree
