@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fd16db9e842b61e380e718b8c035e978efc71ad4dd6bb7c784b47b6763de5ab8
+-- hash: 38a181ca0c53df76c902b84bb28b5694cf6c6f44fc05ad0ebec3b4b49c3e28d8
 
 name:           reversi
 version:        0.31.0
@@ -34,6 +34,7 @@ executable reversi
       base >=4.9 && <5
     , containers
     , mtl
+    , pretty-show
     , random
     , transformers
   default-language: Haskell2010
@@ -56,6 +57,7 @@ test-suite spec
     , containers
     , hspec ==2.*
     , mtl
+    , pretty-show
     , random
     , transformers
   build-tools:

@@ -46,11 +46,9 @@ playAll gs = fmap (flip play $ gs) moveList
 
 genGameTree :: Int -> GameTree -> GameTree
 genGameTree d seed
-    | d == 0 = seed
+    | d <= 0 = seed
     | otherwise = case seed of
                     Node gs []        -> genGameTree (d-1) (Node gs (gameStateToNode <$> playAll gs))
-                    Node gs gameTrees -> Node gs (map (genGameTree (d-1)) gameTrees)
+                    Node gs gameTrees -> Node gs (map (genGameTree (d)) gameTrees)
                     -- gameTrees :: [GameTree]
                     -- gs :: GameTree
-                    -- genGameTree (d-1) :: GameTree -> GameTree
-                    -- (map (genGameTree (d-1)) gameTrees) :: [GameTree]

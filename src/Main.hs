@@ -13,7 +13,9 @@ import Text.Read hiding (get)
 import Actions
 import Board
 import Types 
+import GameTree
 import Control.Monad.State.Lazy
+import Text.Show.Pretty
 
 newtype GameM a = GameM (StateT GameState IO a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadState GameState) -- MonadState GameState is important
@@ -161,3 +163,16 @@ genLoc gs = do
   let possible = plausibleMoves gs
   loc <- randomLoc
   if elem loc possible then return loc else genLoc gs        
+
+test0 :: IO ()
+test0 = pPrint $ genGameTree 0 (Node startingState [])
+
+test1 :: IO ()
+test1 = pPrint $ genGameTree 1 (Node startingState []) 
+
+test2 :: IO ()
+test2 = pPrint $ genGameTree 2 (Node startingState [])
+
+test3 :: IO ()
+test3 = pPrint $ genGameTree 3 (Node startingState []) 
+
