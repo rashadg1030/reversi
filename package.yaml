@@ -22,6 +22,7 @@ executable:
     - Actions
     - Board
     - Types
+    - GameTree
 
 tests:
   spec:

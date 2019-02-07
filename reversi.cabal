@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7f0a774ad452db7a83d15322e8a706826378e878eddaf3a4880580036b962f63
+-- hash: fd16db9e842b61e380e718b8c035e978efc71ad4dd6bb7c784b47b6763de5ab8
 
 name:           reversi
 version:        0.31.0
@@ -26,6 +26,7 @@ executable reversi
       Actions
       Board
       Types
+      GameTree
   hs-source-dirs:
       src
   ghc-options: -Wall

@@ -311,3 +311,41 @@ flipCell (Just White) = Just Black
 
 getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
 getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
+
+-- For modifying GameState
+play :: Location -> GameState -> GameState
+play loc gs = addFrame new old
+      where 
+        new :: GameState 
+        new = (changePlayer . (playDisc loc)) gs
+        old :: GameState
+        old = gs
+
+addFrame :: GameState -> GameState -> GameState
+addFrame (GameState disc board fs) old = GameState disc board (old:fs)  
+
+rewind :: GameState -> GameState
+rewind (GameState disc board []) = GameState disc board [] 
+rewind (GameState _ _ (f:fs))    = GameState (getDisc f) (getBoard f) fs  
+
+playDisc :: Location -> GameState -> GameState
+playDisc loc (GameState disc board fs) = GameState disc (makeMove disc loc board) fs
+
+changePlayer :: GameState -> GameState
+changePlayer (GameState disc board fs) = GameState (flipDisc disc) board fs
+
+noMoves :: GameState -> Bool
+noMoves (GameState disc board _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
+
+getFinal :: GameState -> Final
+getFinal (GameState _ board _) = if step31 == step32 then Tie else Win greater
+  where
+    step1   = Map.toList board 
+    step2   = map snd step1
+    step31  = length $ filter (\d1 -> d1 == White) step2
+    step32  = length $ filter (\d2 -> d2 == Black) step2
+    greater = if step31 > step32 then White else Black
+
+-- PossibleMoves for GameState
+plausibleMoves :: GameState -> [Location]
+plausibleMoves gs = possibleMoves (getDisc gs) (getBoard gs)

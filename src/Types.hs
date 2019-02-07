@@ -14,3 +14,6 @@ type Cell = Maybe Disc
 type Location = (Int, Int)
 
 type Board = Map Location Disc
+
+data GameState = GameState { getDisc :: Disc, getBoard :: Board, getFrames :: [GameState]  }
+  deriving (Show, Eq)
