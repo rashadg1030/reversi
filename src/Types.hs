@@ -17,3 +17,5 @@ type Board = Map Location Disc
 
 data GameState = GameState { getDisc :: Disc, getBoard :: Board, getFrames :: [GameState]  }
   deriving (Show, Eq)
+
+-- Either add a new type to GameState record, or just use prevMove to get the previous move.

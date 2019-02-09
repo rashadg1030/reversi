@@ -6,7 +6,6 @@
 
 module Main where
   
---import qualified Data.Map.Strict as Map
 import Control.Monad.IO.Class
 import System.Random (randomRIO)
 import Text.Read hiding (get)
@@ -127,7 +126,6 @@ stepGame = do
             writeFailMessage gs
             stepGame
   if noMoves gs then gameEnd else stepGame
-
 
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
 gameEnd = do

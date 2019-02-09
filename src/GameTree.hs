@@ -28,15 +28,13 @@ instance Functor RoseTree where
     --         answer :: RoseTree b
     --         answer = (List.<*>) (fs <*>) xs    
             
--- How to return [a] if emptyList of functions is pased in
-listApply :: [(a -> b)] -> [a] -> [b]
-listApply [] _  = []
-listApply _  [] = []
-listApply fs xs = [ f x | f <- fs, x <- xs] 
+-- -- How to return [a] if emptyList of functions is passed in
+-- listApply :: [(a -> b)] -> [a] -> [b]
+-- listApply [] _  = []
+-- listApply _  [] = []
+-- listApply fs xs = [ f x | f <- fs, x <- xs] 
 
-type GameTree = RoseTree GameState
-
-gameStateToNode :: GameState -> GameTree
+gameStateToNode :: GameState -> RoseTree GameState
 gameStateToNode gs = Node gs []
 
 playAll :: GameState -> [GameState]
@@ -44,11 +42,13 @@ playAll gs = fmap (flip play $ gs) moveList
     where 
         moveList = plausibleMoves gs
 
-genGameTree :: Int -> GameTree -> GameTree
+genGameTree :: Int -> RoseTree GameState -> RoseTree GameState
 genGameTree d seed
-    | d <= 0 = seed
+    | d <= 0    = seed 
     | otherwise = case seed of
-                    Node gs []        -> genGameTree d (Node gs (gameStateToNode <$> playAll gs))
-                    Node gs gameTrees -> Node gs (map (genGameTree (d-1)) gameTrees)
-                    -- gameTrees :: [GameTree]
-                    -- gs :: GameTree
+                    Node gs []       -> genGameTree d (Node gs (gameStateToNode <$> playAll gs)) 
+                    Node gs children -> Node gs (map (genGameTree (d-1)) children)
+                    -- children :: [RoseTree GameState]
+                    -- gs :: GameState
+                    -- d-1 one on either path works??
+

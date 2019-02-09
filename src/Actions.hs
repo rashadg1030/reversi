@@ -338,14 +338,14 @@ noMoves :: GameState -> Bool
 noMoves (GameState disc board _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
 
 getFinal :: GameState -> Final
-getFinal (GameState _ board _) = if step31 == step32 then Tie else Win greater
-  where
-    step1   = Map.toList board 
-    step2   = map snd step1
-    step31  = length $ filter (\d1 -> d1 == White) step2
-    step32  = length $ filter (\d2 -> d2 == Black) step2
-    greater = if step31 > step32 then White else Black
+getFinal (GameState d b _)
+        | countDiscs d b == countDiscs (flipDisc d) b = Tie
+        | otherwise = if countDiscs d b > countDiscs (flipDisc d) b then Win d else Win (flipDisc d) 
+    
 
--- PossibleMoves for GameState
+countDiscs :: Disc -> Board -> Int
+countDiscs d = Map.size . (Map.filter (\x -> x == d))
+
+-- possibleMoves for GameState
 plausibleMoves :: GameState -> [Location]
 plausibleMoves gs = possibleMoves (getDisc gs) (getBoard gs)
