@@ -51,23 +51,35 @@ warmMap = makeHeatMap Warm $ centerLocs
 coldMap :: HeatMap
 coldMap = makeHeatMap Cold $ cornerAdjLocs ++ edgeAdjLocs
 
--- mapWithKey :: (k -> a -> b) -> Map k a -> Map k b
--- mapMaybeWithKey :: (k -> a -> Maybe b) -> Map k a -> Map k b
-
+-- Tests --
 test1 :: Int
-test1 = evalBoard Black heatMap startingBoard
+test1 = evalBoard Black heatMap startingBoard -- Should be zero
+
+test2 :: Int
+test2 = evalBoard White heatMap startingBoard -- Should be zero
+
+test3 :: Int
+test3 = evalBoard Black heatMap testBoard1 -- Should -3
+
+test4 :: Int
+test4 = evalBoard White heatMap testBoard1 -- Should +3
+
+test5 :: Int
+test5 = evalBoard Black heatMap testBoard2 -- Should 2
+
+test6 :: Int
+test6 = evalBoard White heatMap testBoard2 -- Should -2
+
+test7 :: Int 
+test7 = evalBoard Black heatMap testBoard3 -- Should 13
 
 evalBoard :: Disc -> HeatMap -> Board -> Int -- The disc being passed in is the maximizing player
 evalBoard d hm b = score d $ heatDiscMap hm b 
 
 score :: Disc -> Map.Map Location (Heat,Disc) -> Int
-score d hdm = sum scoreList
+score d hdm = Map.foldr (+) 0 scoreMap
     where
-        scoreList = map snd $ Map.toList $ Map.map (heatDiscToInt d) hdm 
-
-
-test2 = map snd $ Map.toList $ Map.map (heatDiscToInt Black) $ heatDiscMap heatMap startingBoard 
--- It was woarking! the evaluation of the starting board should be 0!!!
+        scoreMap = Map.map (heatDiscToInt d) hdm 
 
 heatDiscToInt :: Disc -> (Heat, Disc) -> Int --The first arguement is the maximizing player
 heatDiscToInt d hd
@@ -80,6 +92,9 @@ heatDiscToInt d hd
                         Warm -> (-1)
                         Cold -> 2  
 
+-- mapWithKey :: (k -> a -> b) -> Map k a -> Map k b
+-- mapMaybeWithKey :: (k -> a -> Maybe b) -> Map k a -> Map k b
+
 heatDiscMap :: HeatMap -> Board -> Map.Map Location (Heat,Disc)
 heatDiscMap hm b = Map.mapMaybeWithKey (someFunc hm) b
     where
@@ -87,7 +102,7 @@ heatDiscMap hm b = Map.mapMaybeWithKey (someFunc hm) b
         someFunc hm' l d = case Map.lookup l hm' of
             Nothing -> Nothing
             Just h  -> Just (h,d)  
-
+            
 {-          Heat Map
 ---------------------------------
 | H | C | H | H | H | H | C | H |
