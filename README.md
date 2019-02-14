@@ -8,9 +8,11 @@ If you don't have `stack` already go [here](https://docs.haskellstack.org/en/sta
 
 2. Cd into `reversi`
 
-3. Run the command `stack ghci`
+3. Run the command `stack build` 
 
-4. Once everything is compiled, type `main` into the prompt to start a two-player game or type `randomGame` to generate a random game.
+4. Run the command `stack ghci`
+
+5. Once everything is compiled, type `main` into the prompt to start a two-player game or type `randomGame` to generate a random game.
 
 The rules of Reversi can be found [here](https://en.wikipedia.org/wiki/Reversi).
 
