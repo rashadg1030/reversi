@@ -314,7 +314,7 @@ getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWh
 
 -- For modifying GameState
 play :: Location -> GameState -> GameState
-play loc gs = addFrame new old
+play loc gs = addFrame new old     ---- Should pass the old in first then the new
       where 
         new :: GameState 
         new = (changePlayer . (playDisc loc)) gs

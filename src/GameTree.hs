@@ -3,7 +3,8 @@
 module GameTree where
 
 import Types
--- import Board
+import Board
+import qualified Data.Map as Map
 import Actions
 
 data RoseTree a = Node a [RoseTree a] 
@@ -52,3 +53,17 @@ genGameTree d seed
                     -- gs :: GameState
                     -- d-1 one on either path works??
 
+-- findBestMove :: Disc -> RoseTree GameState -> Location
+-- findBestMove d t = case t of
+--                     Node a [] -> getLoc 
+
+
+-- What about when a player passed?
+-- prevMove :: GameState -> Location
+-- prevMove gs
+--     | 
+--     | size difference == 1 = head toList difference
+--     | 
+
+--     where 
+--         difference = Map.difference (getBoard gs) (getBoard $ rewind gs) == 1

@@ -73,8 +73,16 @@ test6 = evalBoard White heatMap testBoard2 -- Should -2
 test7 :: Int 
 test7 = evalBoard Black heatMap testBoard3 -- Should 13
 
+test8 :: Int 
+test8 = evalBoard White heatMap testBoard4 -- It's 1 but I think this should be higher
+
+test9 :: Int 
+test9 = evalBoard White heatMap testBoard6 -- Should be -20
+
 evalBoard :: Disc -> HeatMap -> Board -> Int -- The disc being passed in is the maximizing player
-evalBoard d hm b = score d $ heatDiscMap hm b 
+evalBoard d hm b
+    | length (possibleMoves d b) == 0 = (-20) -- In case there is no moves. Must pass. The maximizing player tries to not to do this. This may not be necessary 
+    | otherwise = score d $ heatDiscMap hm b 
 
 score :: Disc -> Map.Map Location (Heat,Disc) -> Int
 score d hdm = Map.foldr (+) 0 scoreMap
