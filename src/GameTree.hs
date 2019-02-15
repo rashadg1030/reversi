@@ -64,6 +64,5 @@ genGameTree d seed
 --     | 
 --     | size difference == 1 = head toList difference
 --     | 
-
 --     where 
 --         difference = Map.difference (getBoard gs) (getBoard $ rewind gs) == 1
