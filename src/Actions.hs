@@ -80,7 +80,7 @@ validateCaptured ((c:_), (t:_)) = isOppositeCell c t
 
 isOppositeCell :: Cell -> Cell -> Bool
 isOppositeCell Nothing _   = False
-isOppositeCell _ Nothing   = False
+isOppositeCell _ Nothing   = False -- These pattern matches are redundant 
 isOppositeCell x y         = x /= y
 
 followingCellsMinor :: Location -> Board -> [Cell]
