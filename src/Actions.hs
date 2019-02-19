@@ -300,7 +300,7 @@ getRowKeys (_, y) = [(a, y) | a <- [0..7]]
 
 flipCaptured :: ([Cell], [Cell]) -> [Cell]
 flipCaptured ([], [])                       = []
-flipCaptured ([], end)                     = end
+flipCaptured ([], end)                      = end
 flipCaptured (captured, [])                 = captured
 flipCaptured (captured@(c:_), end@(t:_)) = if isOppositeCell c t then (map flipCell captured) ++ end else captured ++ end
 
@@ -344,7 +344,7 @@ getFinal (GameState d b _)
     
 
 countDiscs :: Disc -> Board -> Int
-countDiscs d = Map.size . (Map.filter (\x -> x == d))
+countDiscs d = Map.size . (Map.filter (\x -> x == d)) -- unnecessary lambda
 
 -- possibleMoves for GameState
 plausibleMoves :: GameState -> [Location]
