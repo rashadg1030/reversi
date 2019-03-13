@@ -6,6 +6,7 @@ import Types
 import Board
 import qualified Data.Map as Map
 import Actions
+import Heuristic (evalBoard)
 
 data RoseTree a = Node a [RoseTree a] 
     deriving (Show, Eq)
