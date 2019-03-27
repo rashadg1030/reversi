@@ -14,7 +14,7 @@ import Board
 import Types 
 import GameTree
 import Control.Monad.State.Lazy
-import Text.Show.Pretty
+import Text.Pretty.Simple (pPrint)
 
 newtype GameM a = GameM (StateT GameState IO a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadState GameState) -- MonadState GameState is important

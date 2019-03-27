@@ -7,6 +7,7 @@ import Board
 import qualified Data.Map as Map
 import Actions
 import Heuristic (evalBoard)
+import Text.Pretty.Simple (pPrint)
 
 data RoseTree a = Node a [RoseTree a] 
     deriving (Show, Eq)
@@ -57,6 +58,9 @@ genGameTree depth rt@(Node gs _)
 
 seed :: RoseTree GameState
 seed = gameStateToNode startingState
+
+testGenGameTree :: Int -> IO ()
+testGenGameTree depth = pPrint $ (genGameTree depth seed)
 
 -- findBestMove :: Disc -> RoseTree GameState -> Location
 -- findBestMove d t = case t of
