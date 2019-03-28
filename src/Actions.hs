@@ -323,20 +323,20 @@ play loc gs = addFrame old new
 
 -- These fucnctions aren't really safe
 addFrame :: GameState -> GameState -> GameState
-addFrame old (GameState disc board input fs) = GameState disc board input (old:fs)
+addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)
 
 addInput :: Location -> GameState -> GameState 
-addInput loc (GameState disc board input fs) = GameState disc board loc fs
+addInput loc (GameState disc board _ fs) = GameState disc board (In loc) fs
 
 rewind :: GameState -> GameState
-rewind (GameState disc board _ []) = GameState disc board [] 
-rewind (GameState _ _ _ (f:fs))    = GameState (getDisc f) (getBoard f) fs  
+rewind (GameState disc board m []) = GameState disc board m [] 
+rewind (GameState _ _ _ (f:fs))    = GameState (getDisc f) (getBoard f) (getMove f) fs
 
 playDisc :: Location -> GameState -> GameState
-playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) fs
+playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) (In loc) fs
 
 changePlayer :: GameState -> GameState
-changePlayer (GameState disc board _ fs) = GameState (flipDisc disc) board fs
+changePlayer (GameState disc board m fs) = GameState (flipDisc disc) board m fs
 
 noMoves :: GameState -> Bool
 noMoves (GameState disc board _ _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
