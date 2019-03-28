@@ -322,16 +322,20 @@ play loc gs = addFrame old new
         old = gs
 
 -- These fucnctions aren't really safe
+-- !!!!!!!
 addFrame :: GameState -> GameState -> GameState
 addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)
 
 addInput :: Location -> GameState -> GameState 
 addInput loc (GameState disc board _ fs) = GameState disc board (In loc) fs
 
+-- !!!!!!!!!!!
+
 rewind :: GameState -> GameState
 rewind (GameState disc board m []) = GameState disc board m [] 
 rewind (GameState _ _ _ (f:fs))    = GameState (getDisc f) (getBoard f) (getMove f) fs
 
+-- Might not be safe
 playDisc :: Location -> GameState -> GameState
 playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) (In loc) fs
 
