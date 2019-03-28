@@ -321,7 +321,7 @@ play loc gs = addFrame old new
         old :: GameState
         old = gs
 
--- These fucnctions aren't really safe
+-- These fucnctions aren't really safe. Need to account for pass.
 -- !!!!!!!
 addFrame :: GameState -> GameState -> GameState
 addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)

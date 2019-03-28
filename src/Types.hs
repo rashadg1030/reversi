@@ -15,7 +15,8 @@ type Location = (Int, Int)
 
 -- data Input = Start | Location   -- Confusing lol
 
-data Move = Start | In Location
+-- Should be Pass instead of start. That fixes a problem with Passing
+data Move = Begin | Pass | Move Location
   deriving (Show, Eq)
 
 type Board = Map Location Disc

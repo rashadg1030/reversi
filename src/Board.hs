@@ -234,4 +234,4 @@ makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
 
 startingState :: GameState
-startingState = GameState Black startingBoard Start []
+startingState = GameState Black startingBoard Begin []
