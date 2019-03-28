@@ -74,7 +74,7 @@ test7 :: Int
 test7 = evalBoard Black heatMap testBoard3 -- Should 13
 
 test8 :: Int 
-test8 = evalBoard White heatMap testBoard4 -- It's 1 but I think this should be higher
+test8 = evalBoard White heatMap testBoard4 -- It's 1 but I think this should be higher. Actually this maybe fine.
 
 test9 :: Int 
 test9 = evalBoard White heatMap testBoard6 -- Should be -20

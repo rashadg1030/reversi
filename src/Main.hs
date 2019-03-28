@@ -137,10 +137,6 @@ gameEnd = do
       writeFinalMessage final
   else return ()
 
--- Helper functions --
-startingState :: GameState
-startingState = GameState Black startingBoard []
-
 -- Generate Random Game --
 genRandomGame :: (Logger m, Generator m, MonadState GameState m) => m ()
 genRandomGame = do

@@ -232,3 +232,6 @@ testBoard6 = makeBoard [((0,7), White)]
 
 makeBoard :: [(Location, Disc)] -> Board
 makeBoard = Map.fromList
+
+startingState :: GameState
+startingState = GameState Black startingBoard []
