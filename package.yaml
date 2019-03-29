@@ -16,6 +16,15 @@ dependencies:
   - transformers
   - pretty-simple
 
+default-extensions:
+  - GeneralizedNewtypeDeriving
+  - NamedFieldPuns
+  - TupleSections
+  - FlexibleContexts
+  - FlexibleInstances 
+  - InstanceSigs
+  - TypeSynonymInstances
+
 executable:
   main: Main.hs
   source-dirs: src

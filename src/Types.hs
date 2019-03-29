@@ -2,12 +2,14 @@ module Types where
 
 import Data.Map.Strict (Map)
 
-data State = State Disc Board
+data State = State Disc Board -- maybe not needed\
+  deriving (Show, Eq)
 
 data Disc = Black | White
     deriving (Show, Eq)
 
 data Final = Win Disc | Tie 
+  deriving (Show, Eq)
   
 type Cell = Maybe Disc
 

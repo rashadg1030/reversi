@@ -105,8 +105,7 @@ stepGame = do
   case plausibleMoves gs of
     [] -> do
       writePassMessage gs
-      modify changePlayer
-      stepGame
+      modify pass
     moves -> do
       writePrompt gs
       writePossibleMoves gs
@@ -114,17 +113,14 @@ stepGame = do
       if elem loc moves then 
         do
           writeMoveMessage gs loc
-          modify $ play loc
-          stepGame 
+          modify $ play loc 
       else
         if loc == ((-1), (-1)) then
           do 
             modify rewind
-            stepGame
         else 
           do
             writeFailMessage gs
-            stepGame
   if noMoves gs then gameEnd else stepGame
 
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
@@ -145,7 +141,7 @@ genRandomGame = do
   case plausibleMoves gs of
     [] -> do
       writePassMessage gs
-      modify changePlayer
+      modify pass
     _  -> do
       loc <- genLoc gs
       writeMoveMessage gs loc

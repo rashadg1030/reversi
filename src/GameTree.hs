@@ -10,7 +10,7 @@ import Heuristic (evalBoard)
 import Text.Pretty.Simple (pPrint)
 
 data RoseTree a = Node a [RoseTree a] -- Should be monoid??
-    deriving (Show, Eq)
+  deriving (Show, Eq)
 
 instance Functor RoseTree where
     fmap :: (a -> b) -> RoseTree a -> RoseTree b

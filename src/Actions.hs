@@ -316,13 +316,15 @@ makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDia
 
 -- For modifying GameState
 play :: Location -> GameState -> GameState
-play loc gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } -- Maybe change curr to old
-  | condition = GameState{ getDisc = (flipDisc currDisc), getBoard = makeMove currDisc loc currBoard, getFrames = gs:currFrames }
-  | otherwise = GameState{ getDisc = (flipDisc currDisc), getBoard = currBoard, getMove = Pass, getFrames = gs:currFrames } -- Probably a better way to construct this data
+play loc gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } = -- Maybe change curr to old
+  GameState{ getDisc = (flipDisc currDisc), getBoard = makeMove currDisc loc currBoard, getFrames = gs:currFrames }
   where
-    condition = elem loc $ plausibleMoves gs --Check if location is in list of possibleMoves
     makeMove :: Disc -> Location -> Board -> Board
     makeMove disc loc = ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc))
+
+pass :: GameState -> GameState
+pass gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } = 
+  GameState{ getDisc = (flipDisc currDisc), getBoard = currBoard, getMove = Pass, getFrames = gs:currFrames } -- Probably a better way to construct this data
 
 -- possibleMoves for GameState
 plausibleMoves :: GameState -> [Location]
@@ -337,14 +339,6 @@ addInput loc (GameState disc board _ fs) = GameState disc board (Move loc) fs
 rewind :: GameState -> GameState
 rewind (GameState disc board m []) = GameState disc board m [] 
 rewind (GameState _ _ _ (f:fs))    = GameState (getDisc f) (getBoard f) (getMove f) fs
-
--- Might not be safe
-playDisc :: Location -> GameState -> GameState
-playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) (Move loc) fs
-
-changePlayer :: GameState -> GameState
-changePlayer (GameState disc board m fs) = GameState (flipDisc disc) board m fs
--- !!!!!!!!!!!!!!!!!!!!
 
 noMoves :: GameState -> Bool
 noMoves (GameState disc board _ _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
