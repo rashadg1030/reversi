@@ -14,7 +14,7 @@ dependencies:
   - random
   - mtl
   - transformers
-  - pretty-show
+  - pretty-simple
 
 executable:
   main: Main.hs

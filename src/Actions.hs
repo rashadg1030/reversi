@@ -314,31 +314,39 @@ getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWh
 
 -- For modifying GameState
 play :: Location -> GameState -> GameState
-play loc gs = addFrame new old     ---- Should pass the old in first then the new
+play loc gs = addFrame old new
       where 
         new :: GameState 
         new = (changePlayer . (playDisc loc)) gs
         old :: GameState
         old = gs
 
+-- These fucnctions aren't really safe. Need to account for pass.
+-- !!!!!!!
 addFrame :: GameState -> GameState -> GameState
-addFrame (GameState disc board fs) old = GameState disc board (old:fs)  
+addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)
+
+addInput :: Location -> GameState -> GameState 
+addInput loc (GameState disc board _ fs) = GameState disc board (In loc) fs
+
+-- !!!!!!!!!!!
 
 rewind :: GameState -> GameState
-rewind (GameState disc board []) = GameState disc board [] 
-rewind (GameState _ _ (f:fs))    = GameState (getDisc f) (getBoard f) fs  
+rewind (GameState disc board m []) = GameState disc board m [] 
+rewind (GameState _ _ _ (f:fs))    = GameState (getDisc f) (getBoard f) (getMove f) fs
 
+-- Might not be safe
 playDisc :: Location -> GameState -> GameState
-playDisc loc (GameState disc board fs) = GameState disc (makeMove disc loc board) fs
+playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) (In loc) fs
 
 changePlayer :: GameState -> GameState
-changePlayer (GameState disc board fs) = GameState (flipDisc disc) board fs
+changePlayer (GameState disc board m fs) = GameState (flipDisc disc) board m fs
 
 noMoves :: GameState -> Bool
-noMoves (GameState disc board _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
+noMoves (GameState disc board _ _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
 
 getFinal :: GameState -> Final
-getFinal (GameState d b _)
+getFinal (GameState d b _ _)
         | countDiscs d b == countDiscs (flipDisc d) b = Tie
         | otherwise = if countDiscs d b > countDiscs (flipDisc d) b then Win d else Win (flipDisc d) 
     
