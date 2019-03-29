@@ -192,12 +192,6 @@ isEmptyCell _       = False
 getCell :: Location -> Board -> Cell
 getCell = Map.lookup 
 
--- Functions for making a move and changing the board state to a new one if the move is valid.
-makeMove :: Disc -> Location -> Board -> Board 
-makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
-    where
-        condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
-
 makeMoveDiago :: Disc -> Location -> Board -> Board
 makeMoveDiago disc loc = (makeMoveMinor disc loc) . (makeMoveMajor disc loc) 
 
@@ -312,10 +306,16 @@ flipCell (Just White) = Just Black
 getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
 getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
 
+-- Functions for making a move and changing the board state to a new one if the move is valid.
+makeMove :: Disc -> Location -> Board -> Board 
+makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
+    where
+        condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
+
 -- For modifying GameState
 play :: Location -> GameState -> GameState
 play loc gs = addFrame old new
-      where 
+      where  
         new :: GameState 
         new = (changePlayer . (playDisc loc)) gs
         old :: GameState
@@ -327,7 +327,7 @@ addFrame :: GameState -> GameState -> GameState
 addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)
 
 addInput :: Location -> GameState -> GameState 
-addInput loc (GameState disc board _ fs) = GameState disc board (In loc) fs
+addInput loc (GameState disc board _ fs) = GameState disc board (Move loc) fs
 
 -- !!!!!!!!!!!
 
@@ -337,7 +337,7 @@ rewind (GameState _ _ _ (f:fs))    = GameState (getDisc f) (getBoard f) (getMove
 
 -- Might not be safe
 playDisc :: Location -> GameState -> GameState
-playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) (In loc) fs
+playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) (Move loc) fs
 
 changePlayer :: GameState -> GameState
 changePlayer (GameState disc board m fs) = GameState (flipDisc disc) board m fs
