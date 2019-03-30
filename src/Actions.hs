@@ -342,6 +342,5 @@ getFinal (GameState d b _ _)
         | countDiscs d b == countDiscs (flipDisc d) b = Tie
         | otherwise = if countDiscs d b > countDiscs (flipDisc d) b then Win d else Win (flipDisc d) 
     
-
 countDiscs :: Disc -> Board -> Int
-countDiscs d = Map.size . (Map.filter (\x -> x == d)) -- unnecessary lambda
+countDiscs d = Map.size . (Map.filter ((==) d))
