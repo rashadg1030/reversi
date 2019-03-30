@@ -308,21 +308,13 @@ flipCell (Just White) = Just Black
 getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
 getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
 
--- Functions for making a move and changing the board state to a new one if the move is valid.
-makeMove :: Disc -> Location -> Board -> Board 
-makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
-    where
-        condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
-
--- can delete this later ^^^^^^^
+makeMove :: Disc -> Location -> Board -> Board
+makeMove disc loc = ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc))
 
 -- For modifying GameState
 play :: Location -> GameState -> GameState
 play loc gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } = -- Maybe change curr to old
   GameState{ getDisc = (flipDisc currDisc), getBoard = makeMove currDisc loc currBoard, getMove = Move loc, getFrames = gs:currFrames }
-  where
-    makeMove :: Disc -> Location -> Board -> Board
-    makeMove disc loc = ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc))
 
 pass :: GameState -> GameState
 pass gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } = 

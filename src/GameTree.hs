@@ -39,12 +39,6 @@ genGameTree :: Int -> RoseTree GameState -> RoseTree GameState
 genGameTree depth rt@(Node gs _)
     | depth <= 0 = rt 
     | otherwise  = (Node gs (genGameTree (depth - 1) <$> (gameStateToNode <$> playAll gs)))
-                    --case seed of
-                     --Node gs [] -> genGameTree (depth - 1) (Node gs (gameStateToNode <$> playAll gs)) 
-                     --Node gs children -> Node gs (map (genGameTree (depth-1)) children)
-                    -- children :: [RoseTree GameState]
-                    -- gs :: GameState
-                    -- d-1 one on either path works??
 
 seed :: RoseTree GameState
 seed = gameStateToNode startingState
@@ -83,12 +77,3 @@ testGenGameTree depth = genGameTree depth seed
 -- listApply [] _  = []
 -- listApply _  [] = []
 -- listApply fs xs = [ f x | f <- fs, x <- xs] 
-
--- What about when a player passed?
--- prevMove :: GameState -> Location
--- prevMove gs
---     | 
---     | size difference == 1 = head toList difference
---     | 
---     where 
---         difference = Map.difference (getBoard gs) (getBoard $ rewind gs) == 1
