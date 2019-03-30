@@ -314,10 +314,12 @@ makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDia
     where
         condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
 
+-- can delete this later ^^^^^^^
+
 -- For modifying GameState
 play :: Location -> GameState -> GameState
 play loc gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } = -- Maybe change curr to old
-  GameState{ getDisc = (flipDisc currDisc), getBoard = makeMove currDisc loc currBoard, getFrames = gs:currFrames }
+  GameState{ getDisc = (flipDisc currDisc), getBoard = makeMove currDisc loc currBoard, getMove = Move loc, getFrames = gs:currFrames }
   where
     makeMove :: Disc -> Location -> Board -> Board
     makeMove disc loc = ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc))

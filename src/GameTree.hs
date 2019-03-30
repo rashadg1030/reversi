@@ -24,8 +24,14 @@ countNodes (Node _ xs) = 1 + (sum $ map countNodes xs)
 gameStateToNode :: GameState -> RoseTree GameState
 gameStateToNode gs = Node gs []
 
+
+nextTurn :: GameState -> Location -> GameState
+nextTurn gs loc = case plausibleMoves gs of
+                    [] -> pass gs
+                    _  -> play loc gs
+
 playAll :: GameState -> [GameState]
-playAll gs = fmap (flip play $ gs) moveList -- Change this is confusing
+playAll gs = fmap (nextTurn gs) moveList
     where 
         moveList = plausibleMoves gs
 
