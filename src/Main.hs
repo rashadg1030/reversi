@@ -134,6 +134,7 @@ gameEnd = do
   else return ()
 
 -- Generate Random Game --
+-- Throws error !!!!!
 genRandomGame :: (Logger m, Generator m, MonadState GameState m) => m ()
 genRandomGame = do
   gs <- get
@@ -154,7 +155,6 @@ genLoc gs = do
   loc <- randomLoc
   if elem loc possible then return loc else genLoc gs        
 
--- Tests --
 test0 :: IO ()
 test0 = pPrint $ genGameTree 0 (Node startingState [])
 

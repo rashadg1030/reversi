@@ -15,13 +15,6 @@ flipDisc White = Black
 placeDisc :: Location -> Disc -> Board -> Board 
 placeDisc = Map.insert
 
--- Functions for creating a list of all possible moves for a given color of Disc
-possibleMoves :: Disc -> Board -> [Location]
-possibleMoves disc board = answer 
-    where
-        sieve  = (flip (checkMove disc)) board
-        answer = filter sieve genKeys
-
 checkMove :: Disc -> Location -> Board -> Bool
 checkMove disc loc board = or [(checkMoveOrtho disc loc board), (checkMoveDiago disc loc board)]
 
@@ -323,6 +316,13 @@ pass gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames 
 -- possibleMoves for GameState
 plausibleMoves :: GameState -> [Location]
 plausibleMoves gs = possibleMoves (getDisc gs) (getBoard gs)
+
+-- Functions for creating a list of all possible moves for a given color of Disc
+possibleMoves :: Disc -> Board -> [Location]
+possibleMoves disc board = answer 
+  where
+    sieve  = (flip (checkMove disc)) board
+    answer = filter sieve genKeys
 
 addFrame :: GameState -> GameState -> GameState
 addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)
