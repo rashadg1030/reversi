@@ -59,13 +59,18 @@ testGenGameTree depth = genGameTree depth seed
 --             value := min(value, minimax(child, depth − 1, TRUE))
 --         return value\
 
+newtype MoveScore = MoveScore (Move, Int)
+    deriving (Eq, Show)
 
+instance Ord MoveScore where 
+    (<=) (MoveScore (_, x)) (MoveScore (_, y)) = x <= y 
 
-minmax :: Disc -> Int -> RoseTree GameState -> Int
+minmax :: Disc -> Int -> RoseTree GameState -> MoveScore
 minmax disc depth (Node gs children) 
-  | length children == 0 || depth == 0 = evalBoard disc (getBoard gs)
+  | length children == 0 || depth == 0 = MoveScore (getMove gs, evalBoard disc (getBoard gs))
   | otherwise = if getDisc gs == disc then
                   maximum $ minmax (flipDisc disc) (depth-1) <$> children
                 else
                   minimum $ minmax (disc) (depth-1) <$> children
-    
+
+ 
