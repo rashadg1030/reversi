@@ -74,7 +74,9 @@ validateCaptured (_, [])   = False
 validateCaptured ((c:_), (t:_)) = isOppositeCell c t
 
 isOppositeCell :: Cell -> Cell -> Bool
-isOppositeCell x y = x /= y
+isOppositeCell Nothing _   = False
+isOppositeCell _ Nothing   = False
+isOppositeCell x y         = x /= y
 
 followingCellsMinor :: Location -> Board -> [Cell]
 followingCellsMinor location board = map (lookup' board) (followingKeysMinor location)
