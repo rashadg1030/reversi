@@ -53,36 +53,36 @@ coldMap = makeHeatMap Cold $ cornerAdjLocs ++ edgeAdjLocs
 
 -- Tests --
 test1 :: Int
-test1 = evalBoard Black heatMap startingBoard -- Should be zero
+test1 = evalBoard Black startingBoard -- Should be zero
 
 test2 :: Int
-test2 = evalBoard White heatMap startingBoard -- Should be zero
+test2 = evalBoard White startingBoard -- Should be zero
 
 test3 :: Int
-test3 = evalBoard Black heatMap testBoard1 -- Should -3
+test3 = evalBoard Black testBoard1 -- Should -3
 
 test4 :: Int
-test4 = evalBoard White heatMap testBoard1 -- Should +3
+test4 = evalBoard White testBoard1 -- Should +3
 
 test5 :: Int
-test5 = evalBoard Black heatMap testBoard2 -- Should 2
+test5 = evalBoard Black testBoard2 -- Should 2
 
 test6 :: Int
-test6 = evalBoard White heatMap testBoard2 -- Should -2
+test6 = evalBoard White testBoard2 -- Should -2
 
 test7 :: Int 
-test7 = evalBoard Black heatMap testBoard3 -- Should 13
+test7 = evalBoard Black testBoard3 -- Should 13
 
 test8 :: Int 
-test8 = evalBoard White heatMap testBoard4 -- It's 1 but I think this should be higher. Actually this maybe fine.
+test8 = evalBoard White testBoard4 -- It's 1 but I think this should be higher. Actually this maybe fine.
 
-test9 :: Int 
-test9 = evalBoard White heatMap testBoard6 -- Should be -20
+test9 :: Int  
+test9 = evalBoard White testBoard6 -- Should be -20
 
-evalBoard :: Disc -> HeatMap -> Board -> Int -- The disc being passed in is the maximizing player
-evalBoard d hm b
+evalBoard :: Disc -> Board -> Int -- The disc being passed in is the maximizing player
+evalBoard d b
     | length (possibleMoves d b) == 0 = (-20) -- In case there is no moves. Must pass. The maximizing player tries to not to do this. This may not be necessary 
-    | otherwise = score d $ heatDiscMap hm b 
+    | otherwise = score d $ heatDiscMap heatMap b 
 
 score :: Disc -> Map.Map Location (Heat,Disc) -> Int
 score d hdm = Map.foldr (+) 0 scoreMap

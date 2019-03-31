@@ -74,9 +74,7 @@ validateCaptured (_, [])   = False
 validateCaptured ((c:_), (t:_)) = isOppositeCell c t
 
 isOppositeCell :: Cell -> Cell -> Bool
-isOppositeCell Nothing _   = False
-isOppositeCell _ Nothing   = False -- These pattern matches are redundant 
-isOppositeCell x y         = x /= y
+isOppositeCell x y = x /= y
 
 followingCellsMinor :: Location -> Board -> [Cell]
 followingCellsMinor location board = map (lookup' board) (followingKeysMinor location)
@@ -323,12 +321,6 @@ possibleMoves disc board = answer
   where
     sieve  = (flip (checkMove disc)) board
     answer = filter sieve genKeys
-
-addFrame :: GameState -> GameState -> GameState
-addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)
-
-addInput :: Location -> GameState -> GameState 
-addInput loc (GameState disc board _ fs) = GameState disc board (Move loc) fs
 
 rewind :: GameState -> GameState
 rewind (GameState disc board m []) = GameState disc board m [] 
