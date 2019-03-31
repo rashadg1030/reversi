@@ -101,4 +101,3 @@ spec = do
                                                                 , ((4,5), Black)
                                                                 , ((5,6), Black)
                                                                 , ((6,7), Black)] 
-    -- Needs more tests before refactoring
