@@ -92,6 +92,9 @@ instance Generator GameM where
 main :: IO ()
 main = runGameM stepGame
 
+main2 :: IO ()
+main2 = runGameM aiGame
+
 randomGame :: IO ()
 randomGame = runGameM genRandomGame
 
@@ -123,6 +126,56 @@ stepGame = do
             writeFailMessage gs
   if noMoves gs then gameEnd else stepGame
 
+aiGame :: (Logger m, Control m, MonadState GameState m) => m ()
+aiGame = do
+  gs <- get
+  writeBoard gs
+  if getDisc gs == Black then
+    case plausibleMoves gs of
+      [] -> do
+        writePassMessage gs
+        modify pass
+      moves -> do
+        writePrompt gs
+        writePossibleMoves gs
+        loc <- getInput
+        if elem loc moves then 
+          do
+            writeMoveMessage gs loc
+            modify $ play loc 
+        else
+          if loc == ((-1), (-1)) then
+            do 
+              modify rewind
+          else 
+            do
+              writeFailMessage gs
+  else
+    case plausibleMoves gs of
+      [] -> do
+        writePassMessage gs
+        modify pass
+      moves -> do
+        writePrompt gs
+        writePossibleMoves gs
+        loc <- getAIMove White 3 (genGameTree 3 (toSeed gs))
+        if elem loc moves then 
+          do
+            writeMoveMessage gs loc
+            modify $ play loc 
+        else
+          do
+            writeFailMessage gs
+
+  if noMoves gs then gameEnd else aiGame
+
+-- AI plays white
+getAIMove :: (Logger m, Control m, MonadState GameState m) => Disc -> Int -> RoseTree GameState -> m (Int, Int)
+getAIMove aiDisc depth rt@(Node gs cs) = case (\ms -> case ms of MoveScore (x, _) -> x) $ minmax aiDisc 3 rt of
+                                           Begin  -> error "Bad move"-- genLoc gs
+                                           Pass   -> error "Bad move"-- genLoc gs
+                                           Move x -> return x 
+
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
 gameEnd = do
   gs <- get 
@@ -153,7 +206,7 @@ genLoc :: Generator m => GameState -> m (Int, Int)
 genLoc gs = do
   let possible = plausibleMoves gs
   loc <- randomLoc
-  if elem loc possible then return loc else genLoc gs        
+  if elem loc possible then return loc else genLoc gs  
 
 test0 :: IO ()
 test0 = pPrint $ genGameTree 0 (Node startingState [])
