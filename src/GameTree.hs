@@ -50,6 +50,24 @@ evalLeaves maxDisc rt@(Node root _) = case rt of
   where
     board = getBoard root
 
+evalLeaves' :: RoseTree GameState -> RoseTree (GameState, Int)
+evalLeaves' rt@(Node gs _) = evalLeaves maxDisc $ genGameTree 3 seed  
+  where
+    maxDisc = getDisc gs 
+    seed    = toSeed rt
+
+gsIntTreeToMoveIntTree :: RoseTree (GameState, Int) -> RoseTree (Move, Int)
+gsIntTreeToMoveIntTree rt = someFunc <$> rt
+  where
+    someFunc :: (GameState, Int) -> (Move, Int)
+    someFunc (gs, x) = (getMove gs, x)
+
+toSeed :: RoseTree GameState -> RoseTree GameState
+toSeed (Node gs _) = Node (toBegin gs) []
+  where 
+    toBegin :: GameState -> GameState
+    toBegin gs = gs { getMove = Begin, getFrames = [] }
+
 
 -- !!!!!!Doesn't work good
 -- Takes max Player
@@ -69,12 +87,6 @@ testGenGameTree depth = genGameTree depth testSeed
 
 testSeed :: RoseTree GameState
 testSeed = gameStateToNode startingState
-
--- toSeed :: GameState -> RoseTree GameState
--- toSeed gs = Node (toBegin gs) []
-
--- toBegin :: GameState -> GameState
--- toBegin gs = gs { getMove = Begin, getFrames = [] }
 
 -- newtype MoveScore = MoveScore (Move, Int)
 --     deriving (Eq, Show)
