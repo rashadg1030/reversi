@@ -56,31 +56,39 @@ evalLeaves' rt@(Node gs _) = evalLeaves maxDisc $ genGameTree 3 seed
     maxDisc = getDisc gs 
     seed    = toSeed rt
 
-gsIntTreeToMoveIntTree :: RoseTree (GameState, Int) -> RoseTree (Move, Int)
-gsIntTreeToMoveIntTree rt = someFunc <$> rt
-  where
-    someFunc :: (GameState, Int) -> (Move, Int)
-    someFunc (gs, x) = (getMove gs, x)
-
 toSeed :: RoseTree GameState -> RoseTree GameState
 toSeed (Node gs _) = Node (toBegin gs) []
   where 
     toBegin :: GameState -> GameState
     toBegin gs = gs { getMove = Begin, getFrames = [] }
 
-
 -- !!!!!!Doesn't work good
 -- Takes max Player
--- findBestChild :: Disc -> RoseTree (Int,Disc) -> Int
--- findBestChild disc (Node val children) = if disc == White then maximum $ someFunc <$> children else minimum $ someFunc <$> children
---   where
---     someFunc :: RoseTree Int -> Int
---     someFunc (Node val _) = val 
+instance Ord (GameState, Int) where
+  (<=) (_, x) (_, y) = (<=) x y 
 
--- getBest :: Disc -> RoseTree Int -> RoseTree Int
--- getBest disc rt = case rt of
---                     Node score []       -> Node score []
---                     Node score children -> Node (findBestChild disc rt) (getBest (flipDisc disc) <$> children)
+findBestChild :: Disc -> RoseTree (GameState, Int) -> (GameState, Int)
+findBestChild maxDisc rt = case rt of
+                             (Node gsInt [])       -> gsInt
+                             (Node gsInt children) -> if colorOf gsInt == maxDisc then
+                                                        maximum children
+                                                      else
+                                                        minimum children
+  where
+    colorOf (gs, _) = getDisc gs
+    
+-- Instead of doing everything step by step, do a everything in one go. evalLeaves should
+-- maximum and minimum there.
+                                                      
+
+getBestMove :: RoseTree (Move, Int) -> IO Location
+getBestMove rt = undefined
+
+gsIntTreeToMoveIntTree :: RoseTree (GameState, Int) -> RoseTree (Move, Int)
+gsIntTreeToMoveIntTree rt = someFunc <$> rt
+  where
+    someFunc :: (GameState, Int) -> (Move, Int)
+    someFunc (gs, x) = (getMove gs, x)
 
 testGenGameTree :: Int -> RoseTree GameState
 testGenGameTree depth = genGameTree depth testSeed
