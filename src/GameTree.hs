@@ -54,16 +54,56 @@ testSeed = toSeed startingState
 toSeed :: GameState -> RoseTree GameState
 toSeed gs = Node ( gs { getMove = Begin, getFrames = [] } ) []
 
-runMinmax :: GameState -> Location
-runMinmax gs = minmax (getDisc gs) (genGameTree 3 $ toSeed gs) 
+data Result = Result { gs :: GameState, score' :: Int }
+  deriving (Show, Eq)
 
-minmax :: Disc -> RoseTree GameState -> Location
-minmax (Node gs []) = evalBoard ai board
-minmax (Node gs )   = 
+instance Ord Result where
+  (<=) Result{ gs = g1, score' = s1 } Result{ gs = g2, score' = s2 } = case getMove g1 of
+    Begin  -> case getMove g2 of
+                Begin  -> s1 <= s2
+                Pass   -> True
+                Move _ -> True
+    Pass   -> case getMove g2 of
+                Begin  -> False 
+                Pass   -> s1 <= s2
+                Move _ -> True
+    Move _ -> case getMove g2 of
+                Begin  -> False
+                Pass   -> False
+                Move _ -> s1 <= s2
 
+safeHead :: [a] -> Maybe a
+safeHead []    = Nothing
+safeHead (x:_) = Just x
 
+extractMove :: GameState -> Move
+extractMove gs = answer
+  where
+    answer = undefined
+    peek :: GameState -> Bool
+    peek = undefined
+    resultFrames = getFrames result
+    result       = runMinmax gs
+
+runMinmax :: GameState -> GameState
+runMinmax g = gs $ minmax (getDisc g) (genGameTree 3 $ toSeed g) 
+ 
+-- Almost there but not good because the result is being propgated up the tree
+-- so you don't get a move you can use.
+minmax :: Disc -> RoseTree GameState -> Result
+minmax d (Node gs [])       = Result gs (evalBoard d $ getBoard gs)
+minmax d (Node gs children) = maximum $ (minmax $ flipDisc d) <$> children
     
 -- Instead of doing everything step by step, do a everything in one go. evalLeaves should
 -- maximum and minimum there.
+
+-- -- Should be false
+-- ordTest = Result { move = Move (1,0), score' = 3 } <= Result { move = Begin, score' = 100 }
+
+-- -- should be true
+-- ordTest1 = Result { move = Move (1,0), score' = 3 } <= Result { move = Move (1,0), score' = 100 }
+
+-- -- should be true
+-- ordTest2 = Result { move = Pass, score' = 34 } <= Result { move = Move (1,0), score' = 0 }
 
 
