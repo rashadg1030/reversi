@@ -21,14 +21,14 @@ countNodes :: RoseTree a -> Int
 countNodes (Node _ []) = 1
 countNodes (Node _ xs) = 1 + (sum $ map countNodes xs) 
 
--- For generating a game tree !!!!!!!!!!!!!!!!!!!!!!
-genGameTree :: Int -> RoseTree GameState -> RoseTree GameState
-genGameTree depth rt@(Node gs _)
-  | depth <= 0 = rt 
-  | otherwise  = (Node gs (genGameTree (depth - 1) <$> (gameStateToNode <$> playAll gs)))
-
 gameStateToNode :: GameState -> RoseTree GameState
 gameStateToNode gs = Node gs []
+
+-- For generating a game tree from a given gamestate !!!!!!!!!!!!!!!!!!!!!!
+genGameTree :: Int -> GameState -> RoseTree GameState
+genGameTree depth gs
+  | depth <= 0 = gameStateToNode gs 
+  | otherwise  = (Node gs (genGameTree (depth - 1) <$> (playAll gs)))
 
 nextTurn :: GameState -> Location -> GameState -- Might be wise to make this so that it returns a RoseTree GameState
 nextTurn gs loc = case plausibleMoves gs of
@@ -43,27 +43,27 @@ playAll gs = fmap (nextTurn gs) moveList
 
 -- For testing gameTree generation
 testGenGameTree :: Int -> RoseTree GameState
-testGenGameTree depth = genGameTree depth testSeed
+testGenGameTree depth = genGameTree depth startingState
 
-testSeed :: RoseTree GameState
-testSeed = toSeed startingState
--- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+evalGameState :: GameState -> (Int, GameState) -- The maximizing player is whoever plays next from the current gameState
+evalGameState gs = (evalBoard (getDisc gs) (getBoard gs), gs)
 
--- To start the algorithm, we must first take the game state and 
--- turn it to a beginning gameState node
-toSeed :: GameState -> RoseTree GameState
-toSeed gs = Node ( gs { getMove = Begin, getFrames = [] } ) []
+-- 
 
-runMinmax :: GameState -> Location
-runMinmax gs = minmax (getDisc gs) (genGameTree 3 $ toSeed gs) 
-
-minmax :: Disc -> RoseTree GameState -> Location
-minmax (Node gs []) = evalBoard ai board
-minmax (Node gs )   = 
+runMinmax :: GameState -> Move
+runMinmax gs = getMove . secondToLast . getFrames . snd . minmax $ gameTree
+  where
+    gameTree = genGameTree 3 gs 
+    minmax :: RoseTree GameState -> (Int, GameState)
+    minmax (Node gs [])       = evalGameState gs
+    minmax (Node gs children) = minimum $ minmax <$> children -- needs to be fixed
 
 
-    
--- Instead of doing everything step by step, do a everything in one go. evalLeaves should
--- maximum and minimum there.
+secondToLast :: [a] -> a
+secondToLast []     = error "Empty list."
+secondToLast [x,_]  = x
+secondToLast (_:xs) = secondToLast xs
+
+
 
 

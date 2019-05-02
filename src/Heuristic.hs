@@ -84,6 +84,8 @@ evalBoard d b
     | length (possibleMoves d b) == 0 = (-1000) -- In case there is no moves. Must pass. The maximizing player tries to not to do this. This may not be necessary 
     | otherwise = score d $ heatDiscMap heatMap b
 
+-- evalGameState :: GameState -> Int ??
+
 score :: Disc -> Map.Map Location (Heat,Disc) -> Int
 score d hdm = Map.foldr (+) 0 scoreMap
     where

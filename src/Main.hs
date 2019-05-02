@@ -27,6 +27,7 @@ class Monad m => Logger m where
   writePossibleMoves :: GameState -> m ()
   writeBoard :: GameState -> m ()
   writeFinalMessage :: Final -> m ()
+  writeAny :: Show a => a -> m ()
 
 class Monad m => Control m where
   getInput :: m Location
@@ -72,6 +73,9 @@ instance Logger GameM where
   writeFinalMessage (Win disc) = liftIO . putStrLn $ (show disc) ++ " won! " ++ (show . flipDisc $ disc) ++ " lost!"
   writeFinalMessage Tie        = liftIO . putStrLn $ "It's a tie!" 
 
+  writeAny :: Show a => a -> GameM ()
+  writeAny = liftIO . print
+
 instance Control GameM where
   getInput :: GameM Location
   getInput = do
@@ -94,6 +98,9 @@ main = runGameM stepGame
 
 randomGame :: IO ()
 randomGame = runGameM genRandomGame
+
+aiGame :: IO ()
+aiGame = runGameM aiStepGame
 
 runGameM :: GameM a -> IO a
 runGameM (GameM m) = evalStateT m startingState
@@ -122,6 +129,52 @@ stepGame = do
           do
             writeFailMessage gs
   if noMoves gs then gameEnd else stepGame
+
+aiStepGame :: (Logger m, Control m, MonadState GameState m) => m ()
+aiStepGame = do
+  gs <- get
+  writeBoard gs
+  if getDisc gs == Black then
+    case plausibleMoves gs of
+      [] -> do
+        writePassMessage gs
+        modify pass
+      moves -> do
+        writePrompt gs
+        writePossibleMoves gs
+        loc <- getInput
+        if elem loc moves then 
+          do
+            writeMoveMessage gs loc
+            modify $ play loc 
+        else
+          if loc == ((-1), (-1)) then
+            do 
+              modify rewind
+          else 
+            do
+              writeFailMessage gs
+  else
+    case plausibleMoves gs of
+      [] -> do
+        writePassMessage gs
+        modify pass
+      moves -> do
+        writePrompt gs
+        writePossibleMoves gs
+        let loc = moveToLoc . runMinmax $ refresh gs
+        if elem loc moves then 
+          do
+            writeMoveMessage gs loc
+            modify $ play loc 
+        else
+          do
+            writeFailMessage gs
+
+  if noMoves gs then gameEnd else aiStepGame
+
+refresh :: GameState -> GameState
+refresh gs = gs {getFrames = []}
 
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
 gameEnd = do
@@ -156,56 +209,18 @@ genLoc gs = do
   if elem loc possible then return loc else genLoc gs  
 
 test0 :: IO ()
-test0 = pPrint $ genGameTree 0 (Node startingState [])
+test0 = pPrint $ genGameTree 0 startingState
 
 test1 :: IO ()
-test1 = pPrint $ genGameTree 1 (Node startingState []) 
+test1 = pPrint $ genGameTree 1 startingState
 
 test2 :: IO ()
-test2 = pPrint $ genGameTree 2 (Node startingState [])
+test2 = pPrint $ genGameTree 2 startingState
 
 test3 :: IO ()
-test3 = pPrint $ genGameTree 3 (Node startingState []) 
+test3 = pPrint $ genGameTree 3 startingState 
 
--- aiGame :: (Logger m, Control m, MonadState GameState m) => m ()
--- aiGame = do
---   gs <- get
---   writeBoard gs
---   if getDisc gs == Black then
---     case plausibleMoves gs of
---       [] -> do
---         writePassMessage gs
---         modify pass
---       moves -> do
---         writePrompt gs
---         writePossibleMoves gs
---         loc <- getInput
---         if elem loc moves then 
---           do
---             writeMoveMessage gs loc
---             modify $ play loc 
---         else
---           if loc == ((-1), (-1)) then
---             do 
---               modify rewind
---           else 
---             do
---               writeFailMessage gs
---   else
---     case plausibleMoves gs of
---       [] -> do
---         writePassMessage gs
---         modify pass
---       moves -> do
---         writePrompt gs
---         writePossibleMoves gs
---         loc <- getAIMove White 3 (genGameTree 3 (toSeed gs))
---         if elem loc moves then 
---           do
---             writeMoveMessage gs loc
---             modify $ play loc 
---         else
---           do
---             writeFailMessage gs
-
---   if noMoves gs then gameEnd else aiGame
+moveToLoc :: Move -> Location
+moveToLoc move = case move of
+                   Move loc -> loc
+                   Pass     -> error "The AI wants to pass..."
