@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 module Actions where
 
 import qualified Data.Map.Strict as Map
@@ -12,13 +14,6 @@ flipDisc White = Black
 
 placeDisc :: Location -> Disc -> Board -> Board 
 placeDisc = Map.insert
-
--- Functions for creating a list of all possible moves for a given color of Disc
-possibleMoves :: Disc -> Board -> [Location]
-possibleMoves disc board = answer 
-    where
-        sieve  = (flip (checkMove disc)) board
-        answer = filter sieve genKeys
 
 checkMove :: Disc -> Location -> Board -> Bool
 checkMove disc loc board = or [(checkMoveOrtho disc loc board), (checkMoveDiago disc loc board)]
@@ -80,7 +75,7 @@ validateCaptured ((c:_), (t:_)) = isOppositeCell c t
 
 isOppositeCell :: Cell -> Cell -> Bool
 isOppositeCell Nothing _   = False
-isOppositeCell _ Nothing   = False -- These pattern matches are redundant 
+isOppositeCell _ Nothing   = False
 isOppositeCell x y         = x /= y
 
 followingCellsMinor :: Location -> Board -> [Cell]
@@ -191,12 +186,6 @@ isEmptyCell _       = False
 
 getCell :: Location -> Board -> Cell
 getCell = Map.lookup 
-
--- Functions for making a move and changing the board state to a new one if the move is valid.
-makeMove :: Disc -> Location -> Board -> Board 
-makeMove disc loc board = if condition then ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc)) board else board 
-    where
-        condition = elem loc (possibleMoves disc board) --Check if location is in list of possibleMoves
 
 makeMoveDiago :: Disc -> Location -> Board -> Board
 makeMoveDiago disc loc = (makeMoveMinor disc loc) . (makeMoveMajor disc loc) 
@@ -312,35 +301,32 @@ flipCell (Just White) = Just Black
 getCaptured :: Cell -> [Cell] -> ([Cell], [Cell])
 getCaptured measure cells = ((takeWhile (isOppositeCell measure) cells), (dropWhile (isOppositeCell measure) cells)) 
 
+makeMove :: Disc -> Location -> Board -> Board
+makeMove disc loc = ((placeDisc loc disc) . (makeMoveDiago disc loc) . (makeMoveOrtho disc loc))
+
 -- For modifying GameState
 play :: Location -> GameState -> GameState
-play loc gs = addFrame old new
-      where 
-        new :: GameState 
-        new = (changePlayer . (playDisc loc)) gs
-        old :: GameState
-        old = gs
+play loc gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } = -- Maybe change curr to old
+  GameState{ getDisc = (flipDisc currDisc), getBoard = makeMove currDisc loc currBoard, getMove = Move loc, getFrames = gs:currFrames }
 
--- These fucnctions aren't really safe. Need to account for pass.
--- !!!!!!!
-addFrame :: GameState -> GameState -> GameState
-addFrame old (GameState disc board move fs) = GameState disc board move (old:fs)
+pass :: GameState -> GameState
+pass gs@GameState{ getDisc = currDisc, getBoard = currBoard, getMove, getFrames = currFrames } = 
+  GameState{ getDisc = (flipDisc currDisc), getBoard = currBoard, getMove = Pass, getFrames = gs:currFrames } -- Probably a better way to construct this data
 
-addInput :: Location -> GameState -> GameState 
-addInput loc (GameState disc board _ fs) = GameState disc board (In loc) fs
+-- possibleMoves for GameState
+plausibleMoves :: GameState -> [Location]
+plausibleMoves gs = possibleMoves (getDisc gs) (getBoard gs)
 
--- !!!!!!!!!!!
+-- Functions for creating a list of all possible moves for a given color of Disc
+possibleMoves :: Disc -> Board -> [Location]
+possibleMoves disc board = answer 
+  where
+    sieve  = (flip (checkMove disc)) board
+    answer = filter sieve genKeys
 
 rewind :: GameState -> GameState
 rewind (GameState disc board m []) = GameState disc board m [] 
 rewind (GameState _ _ _ (f:fs))    = GameState (getDisc f) (getBoard f) (getMove f) fs
-
--- Might not be safe
-playDisc :: Location -> GameState -> GameState
-playDisc loc (GameState disc board _ fs) = GameState disc (makeMove disc loc board) (In loc) fs
-
-changePlayer :: GameState -> GameState
-changePlayer (GameState disc board m fs) = GameState (flipDisc disc) board m fs
 
 noMoves :: GameState -> Bool
 noMoves (GameState disc board _ _) = ((length $ possibleMoves disc board) == 0) && ((length $ possibleMoves (flipDisc disc) board) == 0)
@@ -350,10 +336,5 @@ getFinal (GameState d b _ _)
         | countDiscs d b == countDiscs (flipDisc d) b = Tie
         | otherwise = if countDiscs d b > countDiscs (flipDisc d) b then Win d else Win (flipDisc d) 
     
-
 countDiscs :: Disc -> Board -> Int
-countDiscs d = Map.size . (Map.filter (\x -> x == d)) -- unnecessary lambda
-
--- possibleMoves for GameState
-plausibleMoves :: GameState -> [Location]
-plausibleMoves gs = possibleMoves (getDisc gs) (getBoard gs)
+countDiscs d = Map.size . (Map.filter ((==) d))

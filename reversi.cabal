@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 352002427914cb3dcab6f9209cc536056eced4b9d319b03d9417602606fdd0d6
+-- hash: 1ca763c0d6e8090c9a59a619a8291f31d76104940caf33721b1a25e13f2de09b
 
 name:           reversi
 version:        0.31.0
@@ -30,6 +30,7 @@ executable reversi
       Heuristic
   hs-source-dirs:
       src
+  default-extensions: GeneralizedNewtypeDeriving NamedFieldPuns TupleSections FlexibleContexts FlexibleInstances InstanceSigs TypeSynonymInstances
   ghc-options: -Wall
   build-depends:
       base >=4.9 && <5
@@ -51,6 +52,7 @@ test-suite spec
   hs-source-dirs:
       tests
       src
+  default-extensions: GeneralizedNewtypeDeriving NamedFieldPuns TupleSections FlexibleContexts FlexibleInstances InstanceSigs TypeSynonymInstances
   ghc-options: -Wall
   cpp-options: -DTEST
   build-depends:

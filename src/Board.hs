@@ -1,8 +1,6 @@
 module Board where
 
 import qualified Data.Map.Strict as Map
-import Data.Map.Strict (Map)
-
 import Types
 
 -- Start --
@@ -38,7 +36,7 @@ boardToCells board = map (lookup' board) genKeys
 genKeys :: [Location]
 genKeys = [(x, y) | y <- [0..7], x <- [0..7]]
 
-lookup' :: Ord k => Map k a -> k -> Maybe a
+lookup' :: Ord k => Map.Map k a -> k -> Maybe a
 lookup' = flip Map.lookup
 
 -- Test boards for testing different game states

@@ -105,8 +105,7 @@ stepGame = do
   case plausibleMoves gs of
     [] -> do
       writePassMessage gs
-      modify changePlayer
-      stepGame
+      modify pass
     moves -> do
       writePrompt gs
       writePossibleMoves gs
@@ -114,17 +113,14 @@ stepGame = do
       if elem loc moves then 
         do
           writeMoveMessage gs loc
-          modify $ play loc
-          stepGame 
+          modify $ play loc 
       else
         if loc == ((-1), (-1)) then
           do 
             modify rewind
-            stepGame
         else 
           do
             writeFailMessage gs
-            stepGame
   if noMoves gs then gameEnd else stepGame
 
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
@@ -138,6 +134,7 @@ gameEnd = do
   else return ()
 
 -- Generate Random Game --
+-- Throws error !!!!!
 genRandomGame :: (Logger m, Generator m, MonadState GameState m) => m ()
 genRandomGame = do
   gs <- get
@@ -145,7 +142,7 @@ genRandomGame = do
   case plausibleMoves gs of
     [] -> do
       writePassMessage gs
-      modify changePlayer
+      modify pass
     _  -> do
       loc <- genLoc gs
       writeMoveMessage gs loc
@@ -156,7 +153,7 @@ genLoc :: Generator m => GameState -> m (Int, Int)
 genLoc gs = do
   let possible = plausibleMoves gs
   loc <- randomLoc
-  if elem loc possible then return loc else genLoc gs        
+  if elem loc possible then return loc else genLoc gs  
 
 test0 :: IO ()
 test0 = pPrint $ genGameTree 0 (Node startingState [])
@@ -170,3 +167,45 @@ test2 = pPrint $ genGameTree 2 (Node startingState [])
 test3 :: IO ()
 test3 = pPrint $ genGameTree 3 (Node startingState []) 
 
+-- aiGame :: (Logger m, Control m, MonadState GameState m) => m ()
+-- aiGame = do
+--   gs <- get
+--   writeBoard gs
+--   if getDisc gs == Black then
+--     case plausibleMoves gs of
+--       [] -> do
+--         writePassMessage gs
+--         modify pass
+--       moves -> do
+--         writePrompt gs
+--         writePossibleMoves gs
+--         loc <- getInput
+--         if elem loc moves then 
+--           do
+--             writeMoveMessage gs loc
+--             modify $ play loc 
+--         else
+--           if loc == ((-1), (-1)) then
+--             do 
+--               modify rewind
+--           else 
+--             do
+--               writeFailMessage gs
+--   else
+--     case plausibleMoves gs of
+--       [] -> do
+--         writePassMessage gs
+--         modify pass
+--       moves -> do
+--         writePrompt gs
+--         writePossibleMoves gs
+--         loc <- getAIMove White 3 (genGameTree 3 (toSeed gs))
+--         if elem loc moves then 
+--           do
+--             writeMoveMessage gs loc
+--             modify $ play loc 
+--         else
+--           do
+--             writeFailMessage gs
+
+--   if noMoves gs then gameEnd else aiGame
