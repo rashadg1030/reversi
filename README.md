@@ -29,5 +29,5 @@ Use `Ctrl + C` to exit the game at any time.
 
 You can replay the previous game state by entering `((-1),(-1))`.
 
-A.I. is now available. Type `aiGame` into the the prompt to play against the A.I. I'm still tweaking the algorithm, so it might
+A.I. is now available. After running the command `stack ghci`, type `aiGame` into the the prompt to play against the A.I. I'm still tweaking the algorithm, so it might
 be easy to beat. Enjoy!
