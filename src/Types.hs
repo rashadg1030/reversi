@@ -3,7 +3,7 @@ module Types where
 import Data.Map.Strict (Map)
 
 data Disc = Black | White
-    deriving (Show, Eq)
+    deriving (Show, Eq, Ord) --Ord??
 
 data Final = Win Disc | Tie 
   deriving (Show, Eq)
@@ -12,15 +12,10 @@ type Cell = Maybe Disc
 
 type Location = (Int, Int)
 
-data Move = Begin | Pass | Move Location
-  deriving (Show, Eq)
-
-instance Ord Move where
-  (<=) Begin Pass = True
-  (<=) Pass (Move _) = True
-  (<=) (Move x) (Move y) = x <= y  
+data Move = Pass | Move Location
+  deriving (Show, Eq, Ord) -- Ord??
 
 type Board = Map Location Disc
 
 data GameState = GameState { getDisc :: Disc, getBoard :: Board, getMove :: Move, getFrames :: [GameState]  }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
