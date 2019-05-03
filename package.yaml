@@ -34,15 +34,20 @@ library:
     - Reversi.Types
   source-dirs: src
 
-executable:
-  main: Main.hs
-  source-dirs: src
-  other-modules:
-    - Reversi.Actions
-    - Reversi.Board
-    - Reversi.Types
-    - Reversi.GameTree
-    - Reversi.Heuristic
+executables:
+  two-player-exe: 
+    main: Main.hs
+    source-dirs: app/two-player
+    dependencies: reversi
+  random-exe:
+    main: Main.hs
+    source-dirs: app/random
+    dependencies: reversi
+  reversi-ai-exe:
+    main: Main.hs
+    source-dirs: app/ai
+    dependencies: reversi
+  
 
 tests:
   spec:

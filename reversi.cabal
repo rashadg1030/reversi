@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0593789c314fa1203ade7bee85526bc1f86362a7c254f90b110d40f3d0955e57
+-- hash: 7f7ff4feec508f4bb9840442d4fcaa40cb7dfd8faab1d78de4cc92f9f1c5be56
 
 name:           reversi
 version:        0.31.0
@@ -28,7 +28,6 @@ library
       Reversi.Heuristic
       Reversi.Types
   other-modules:
-      Main
       Paths_reversi
   hs-source-dirs:
       src
@@ -43,16 +42,12 @@ library
     , transformers
   default-language: Haskell2010
 
-executable reversi
+executable random-exe
   main-is: Main.hs
   other-modules:
-      Reversi.Actions
-      Reversi.Board
-      Reversi.Types
-      Reversi.GameTree
-      Reversi.Heuristic
+      Paths_reversi
   hs-source-dirs:
-      src
+      app/random
   default-extensions: GeneralizedNewtypeDeriving NamedFieldPuns TupleSections FlexibleContexts FlexibleInstances InstanceSigs TypeSynonymInstances
   ghc-options: -Wall
   build-depends:
@@ -61,6 +56,43 @@ executable reversi
     , mtl
     , pretty-simple
     , random
+    , reversi
+    , transformers
+  default-language: Haskell2010
+
+executable reversi-ai-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_reversi
+  hs-source-dirs:
+      app/ai
+  default-extensions: GeneralizedNewtypeDeriving NamedFieldPuns TupleSections FlexibleContexts FlexibleInstances InstanceSigs TypeSynonymInstances
+  ghc-options: -Wall
+  build-depends:
+      base >=4.9 && <5
+    , containers
+    , mtl
+    , pretty-simple
+    , random
+    , reversi
+    , transformers
+  default-language: Haskell2010
+
+executable two-player-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_reversi
+  hs-source-dirs:
+      app/two-player
+  default-extensions: GeneralizedNewtypeDeriving NamedFieldPuns TupleSections FlexibleContexts FlexibleInstances InstanceSigs TypeSynonymInstances
+  ghc-options: -Wall
+  build-depends:
+      base >=4.9 && <5
+    , containers
+    , mtl
+    , pretty-simple
+    , random
+    , reversi
     , transformers
   default-language: Haskell2010
 

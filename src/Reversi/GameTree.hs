@@ -54,8 +54,8 @@ runMinmax gs = getMove . secondToLast . getFrames . snd . minmax $ gameTree
     minmax :: RoseTree GameState -> (Int, GameState)
     minmax (Node gs [])       = evalGameState gs
     minmax (Node gs children) = case getDisc gs of 
-                                  White -> maximum $ minmax <$> children
-                                  Black -> minimum $ minmax <$> children 
+                                  White -> minimum $ minmax <$> children
+                                  Black -> maximum $ minmax <$> children 
 
 refresh :: GameState -> GameState
 refresh gs = gs {getFrames = []}
