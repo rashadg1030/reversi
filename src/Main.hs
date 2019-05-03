@@ -9,10 +9,10 @@ module Main where
 import Control.Monad.IO.Class
 import System.Random (randomRIO)
 import Text.Read hiding (get)
-import Actions
-import Board
-import Types 
-import GameTree
+import Reversi.Actions
+import Reversi.Board
+import Reversi.Types 
+import Reversi.GameTree
 import Control.Monad.State.Lazy
 import Text.Pretty.Simple (pPrint)
 
@@ -173,9 +173,6 @@ aiStepGame = do
 
   if noMoves gs then gameEnd else aiStepGame
 
-refresh :: GameState -> GameState
-refresh gs = gs {getFrames = []}
-
 gameEnd :: (Logger m, MonadState GameState m) => m () -- Need (MonadState GameState m) constraint
 gameEnd = do
   gs <- get 
@@ -219,8 +216,3 @@ test2 = pPrint $ genGameTree 2 startingState
 
 test3 :: IO ()
 test3 = pPrint $ genGameTree 3 startingState 
-
-moveToLoc :: Move -> Location
-moveToLoc move = case move of
-                   Move loc -> loc
-                   Pass     -> error "The AI wants to pass..."

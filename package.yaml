@@ -25,15 +25,24 @@ default-extensions:
   - InstanceSigs
   - TypeSynonymInstances
 
+library:
+  exposed-modules:
+    - Reversi.Actions
+    - Reversi.Board
+    - Reversi.GameTree
+    - Reversi.Heuristic
+    - Reversi.Types
+  source-dirs: src
+
 executable:
   main: Main.hs
   source-dirs: src
   other-modules:
-    - Actions
-    - Board
-    - Types
-    - GameTree
-    - Heuristic
+    - Reversi.Actions
+    - Reversi.Board
+    - Reversi.Types
+    - Reversi.GameTree
+    - Reversi.Heuristic
 
 tests:
   spec:
@@ -43,10 +52,10 @@ tests:
       - tests
       - src
     other-modules:
-      - Actions
-      - Board
-      - Types
-      - ActionsSpec
+      - Reversi.Actions
+      - Reversi.Board
+      - Reversi.Types
+      - Reversi.ActionsSpec
     dependencies:
       - hspec == 2.*
     build-tools: hspec-discover

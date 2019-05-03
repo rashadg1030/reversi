@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1ca763c0d6e8090c9a59a619a8291f31d76104940caf33721b1a25e13f2de09b
+-- hash: 0593789c314fa1203ade7bee85526bc1f86362a7c254f90b110d40f3d0955e57
 
 name:           reversi
 version:        0.31.0
@@ -20,14 +20,37 @@ source-repository head
   type: git
   location: https://github.com/https://github.com/rashadg1030
 
+library
+  exposed-modules:
+      Reversi.Actions
+      Reversi.Board
+      Reversi.GameTree
+      Reversi.Heuristic
+      Reversi.Types
+  other-modules:
+      Main
+      Paths_reversi
+  hs-source-dirs:
+      src
+  default-extensions: GeneralizedNewtypeDeriving NamedFieldPuns TupleSections FlexibleContexts FlexibleInstances InstanceSigs TypeSynonymInstances
+  ghc-options: -Wall
+  build-depends:
+      base >=4.9 && <5
+    , containers
+    , mtl
+    , pretty-simple
+    , random
+    , transformers
+  default-language: Haskell2010
+
 executable reversi
   main-is: Main.hs
   other-modules:
-      Actions
-      Board
-      Types
-      GameTree
-      Heuristic
+      Reversi.Actions
+      Reversi.Board
+      Reversi.Types
+      Reversi.GameTree
+      Reversi.Heuristic
   hs-source-dirs:
       src
   default-extensions: GeneralizedNewtypeDeriving NamedFieldPuns TupleSections FlexibleContexts FlexibleInstances InstanceSigs TypeSynonymInstances
@@ -45,10 +68,10 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Actions
-      Board
-      Types
-      ActionsSpec
+      Reversi.Actions
+      Reversi.Board
+      Reversi.Types
+      Reversi.ActionsSpec
   hs-source-dirs:
       tests
       src
